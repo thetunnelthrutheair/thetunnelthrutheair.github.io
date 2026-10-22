@@ -1,96 +1,17 @@
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="NIFTY 50 index information from the official National Stock Exchange of India.">
-  <title>NIFTY 50 | Official NSE Data</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f3f6fa;
-      color: #172033;
-    }
-    header {
-      background: #123c69;
-      color: white;
-      padding: 24px 20px;
-      text-align: center;
-    }
-    main {
-      max-width: 760px;
-      margin: 48px auto;
-      padding: 20px;
-    }
-    .panel {
-      background: white;
-      border-radius: 14px;
-      padding: 30px;
-      box-shadow: 0 5px 24px #152b4612;
-      text-align: center;
-    }
-    h1 { margin-top: 0; }
-    .note {
-      color: #536176;
-      line-height: 1.7;
-    }
-    .link {
-      display: inline-block;
-      margin-top: 18px;
-      padding: 14px 22px;
-      border-radius: 8px;
-      background: #087443;
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .link:hover { background: #065d36; }
-    footer {
-      text-align: center;
-      padding: 20px;
-      color: #657187;
-      font-size: 13px;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>NIFTY 50</h1>
-    <p>National Stock Exchange of India</p>
-  </header>
-
-  <main>
-    <section class="panel">
-      <h2>Official NSE Index Data</h2>
-      <p class="note">
-        View the NIFTY 50 index value, daily change, index details
-        and other available information directly on the official
-        National Stock Exchange of India website.
-      </p>
-      <a
-        class="link"
-        href="https://www.nseindia.com/static/products-services/indices-nifty50-index"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        View NIFTY 50 on NSE ↗
-      </a>
-      <p class="note">
-        Data is displayed on NSE's website. This page does not
-        independently retrieve or reproduce live market prices.
-      </p>
-    </section>
-  </main>
-
-  <footer>
-    Market data source:
-    <a href="https://www.nseindia.com/" target="_blank"
-       rel="noopener noreferrer">NSE India</a>
-    <p>Market information may be delayed. Verify data on the official exchange.</p>
-  </footer>
-</body>
-</html>
-
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#06111f"><title>Market Atlas — NIFTY 50</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+:root{color-scheme:dark;--bg:#050d18;--panel:#0a1929;--line:#18344b;--text:#edf6ff;--muted:#91a9bd;--green:#00d69a;--red:#ff5574;--blue:#59d7ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 72% 0%,#183550 0,transparent 38%),var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}.app{display:grid;grid-template-columns:215px minmax(0,1fr);min-height:100vh}.side{border-right:1px solid var(--line);padding:24px 15px;display:flex;flex-direction:column;background:#06111fe8}.brand{display:flex;gap:10px;align-items:center;padding:0 6px 25px;border-bottom:1px solid #132b40}.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#60e7ff,#157bc4);display:grid;place-items:center;color:#041421;font-size:23px;font-weight:800}.brand b{font:800 16px Manrope}.brand small{display:block;color:var(--muted);font-size:10px;margin-top:3px}.nav{display:grid;gap:7px;margin-top:23px}.nav button{border:1px solid transparent;background:none;color:#b5c8d9;text-align:left;padding:12px;border-radius:11px;font-size:13px;cursor:pointer}.nav button.active,.nav button:hover{background:linear-gradient(90deg,#12314a,#0c2135);border-color:#20445f;color:white}.nav span{display:inline-block;width:25px;color:var(--blue)}.quote{margin-top:auto;padding:20px 8px 0;color:#91a9bd;font-size:12px;line-height:1.8;font-style:italic}.quote b{display:block;font-style:normal;color:#d8e8f6;margin-top:10px;font-weight:500}main{min-width:0;padding:27px clamp(14px,3vw,40px) 22px}.hero{position:relative;overflow:hidden;border:1px solid #21465f;border-radius:22px;min-height:175px;padding:29px;background:linear-gradient(100deg,#0b1c2e 2%,#102b43dd 49%,#102b4355),radial-gradient(ellipse at 82% 25%,#fb9d8a66,transparent 22%),linear-gradient(145deg,#102e48,#081321 70%);margin-bottom:17px}.hero:before{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#06111f 0%,transparent 55%),repeating-linear-gradient(160deg,transparent 0 42px,#8edfff08 43px 44px)}.heroContent{position:relative;max-width:700px}.eyebrow{color:var(--blue);text-transform:uppercase;letter-spacing:2.4px;font-size:10px;font-weight:700}h1{font:700 clamp(29px,4vw,44px) Manrope;letter-spacing:-1.4px;margin:9px 0 4px}.hero p{margin:0;color:#b5c9d9}.tagline{margin-top:15px!important;color:#d3e8f8!important;font-size:15px}.pill{position:absolute;right:20px;top:20px;border:1px solid #45617b;background:#061522aa;padding:9px 12px;border-radius:30px;color:#c3d6e5;font-size:11px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);margin-right:7px}.grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(240px,.8fr);gap:15px}.card{background:linear-gradient(145deg,#0c2032,#081624);border:1px solid var(--line);border-radius:17px;padding:19px;min-width:0}.cardhead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:14px}.cardtitle{font:700 13px Manrope}.muted{font-size:11px;color:var(--muted)}.indexrow{display:flex;align-items:flex-end;gap:13px;flex-wrap:wrap}.indexvalue{font:800 clamp(30px,4vw,42px) Manrope;letter-spacing:-1.5px}.positive{color:var(--green)}.negative{color:var(--red)}.changebig{font:600 13px 'DM Mono';padding-bottom:7px}.chart{height:75px;width:100%;margin-top:9px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;border-top:1px solid var(--line);padding-top:14px;margin-top:5px}.mlabel{font-size:10px;color:var(--muted);margin-bottom:6px}.mvalue{font:500 13px 'DM Mono'}.mood{display:flex;align-items:center;gap:16px}.donut{width:88px;height:88px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;position:relative;background:#19344a}.donut:before{content:'';position:absolute;inset:8px;border-radius:50%;background:#0a1929}.donutcenter{position:relative;text-align:center;font:700 23px Manrope}.donutcenter small{display:block;font:10px 'DM Mono';color:var(--muted)}.moodlist{flex:1;display:grid;gap:13px}.mooditem{display:flex;align-items:center;gap:8px;font-size:12px;color:#c3d5e4}.mooditem b{margin-left:auto;font:500 12px 'DM Mono';color:white}.bullet{width:8px;height:8px;border-radius:3px}.upbullet{background:var(--green)}.downbullet{background:var(--red)}.flatbullet{background:#829bb4}.tools{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:19px 0 13px}.search{position:relative;flex:1;min-width:180px}.search input{width:100%;background:#0a1b2c;border:1px solid var(--line);border-radius:11px;padding:11px 13px;color:white;outline:none}.search input:focus{border-color:#3d9cc4}.tools select,.tools button{background:#0a1b2c;border:1px solid var(--line);color:#c6d9e8;border-radius:11px;padding:11px 12px;font-size:12px;cursor:pointer}.legend{display:flex;gap:11px;align-items:center;color:var(--muted);font-size:11px}.legend i{width:9px;height:9px;border-radius:3px;display:inline-block;margin-right:4px}.heathead{display:flex;justify-content:space-between;align-items:center;margin:15px 2px 12px}.heathead h2{font:700 17px Manrope;margin:0}.heatmap{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}.tile{min-width:0;text-align:left;padding:11px 10px;border:1px solid var(--border);border-radius:10px;background:linear-gradient(145deg,var(--tile),#071b28);color:white;min-height:98px;display:flex;flex-direction:column;justify-content:space-between;transition:transform .15s,filter .15s;overflow:hidden}.tile:hover{transform:translateY(-2px);filter:brightness(1.17);border-color:#a3d9f1}.symbol{font-size:11px;font-weight:800;overflow-wrap:anywhere}.price{font:600 12px 'DM Mono';margin-top:10px;white-space:nowrap}.change{font:500 11px 'DM Mono';margin-top:5px}.change.up{color:#52f2bb}.change.down{color:#ff879c}.change.flat{color:#bdccda}.cap{font-size:9px;color:#c0d8d5a8;margin-top:7px}.empty{grid-column:1/-1;border:1px dashed #25465f;border-radius:15px;padding:32px 18px;text-align:center;color:var(--muted);line-height:1.7}.empty strong{display:block;color:#eaf6ff;font:700 16px Manrope;margin-bottom:7px}.error{color:#ffb2bf;font-size:12px;margin-top:10px}.note{margin:15px 2px 0;color:#728ba1;font-size:10px;line-height:1.7}.footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid #152d42;margin-top:23px;padding:17px 2px 0;color:#69849a;font-size:10px;letter-spacing:.8px}.footer b{color:#a6bfd1;font-weight:500}@media(max-width:1120px){.app{grid-template-columns:175px minmax(0,1fr)}.heatmap{grid-template-columns:repeat(5,minmax(0,1fr))}.grid{grid-template-columns:1fr}}@media(max-width:740px){.app{display:block}.side{padding:12px;border-right:0;border-bottom:1px solid var(--line)}.brand{padding:0 4px 8px;border:0}.nav{display:flex;overflow:auto;margin-top:7px}.nav button{white-space:nowrap;padding:9px}.quote{display:none}main{padding:14px 11px}.hero{padding:22px 17px;min-height:165px}.pill{position:relative;display:inline-block;top:auto;right:auto;margin-top:14px}.metrics{grid-template-columns:repeat(2,1fr);row-gap:13px}.heatmap{grid-template-columns:repeat(3,minmax(0,1fr))}.tile{min-height:91px;padding:9px 8px}.legend{width:100%;padding:4px 0}}@media(max-width:430px){.heatmap{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:14px}.indexvalue{font-size:30px}.mood{gap:11px}.donut{width:78px;height:78px}}
+</style></head><body><div class="app"><aside class="side"><div class="brand"><div class="logo">⌁</div><div><b>MARKET ATLAS</b><small>Indian markets. Beautifully.</small></div></div><nav class="nav"><button class="active" data-view="all"><span>⌂</span>Overview</button><button data-view="all"><span>▦</span>Heatmap</button><button data-view="gainers"><span>↗</span>Top gainers</button><button data-view="losers"><span>↘</span>Top losers</button></nav><div class="quote">“The stock market is a device for transferring money from the impatient to the patient.”<b>— Warren Buffett</b></div></aside>
+<main><section class="hero"><div class="heroContent"><div class="eyebrow">India · National Stock Exchange</div><h1>NIFTY 50</h1><p>India's benchmark. Fifty companies. One market.</p><p class="tagline">Clarity in every market move.</p></div><div class="pill"><span class="dot"></span><span id="feedState">Awaiting data feed</span> · <span id="clock">--:--:-- IST</span></div></section>
+<section class="grid"><article class="card"><div class="cardhead"><div class="cardtitle">NIFTY 50 INDEX</div><span class="muted">Index snapshot</span></div><div class="indexrow"><div class="indexvalue" id="indexValue">—</div><div class="changebig" id="indexChange">Waiting for data</div></div><svg class="chart" viewBox="0 0 650 100" preserveAspectRatio="none" aria-label="Decorative trend illustration"><defs><linearGradient id="area" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#00d69a" stop-opacity=".27"/><stop offset="100%" stop-color="#00d69a" stop-opacity="0"/></linearGradient></defs><path d="M0,76 L30,71 58,74 86,60 113,65 145,49 170,55 201,42 229,51 260,36 289,42 318,27 350,38 379,23 405,33 438,19 470,27 503,13 533,21 565,10 596,17 620,5 650,12 L650,100 L0,100 Z" fill="url(#area)"/><path d="M0,76 L30,71 58,74 86,60 113,65 145,49 170,55 201,42 229,51 260,36 289,42 318,27 350,38 379,23 405,33 438,19 470,27 503,13 533,21 565,10 596,17 620,5 650,12" fill="none" stroke="#00d69a" stroke-width="2.2"/></svg><div class="metrics"><div><div class="mlabel">OPEN</div><div class="mvalue" id="open">—</div></div><div><div class="mlabel">DAY HIGH</div><div class="mvalue" id="high">—</div></div><div><div class="mlabel">DAY LOW</div><div class="mvalue" id="low">—</div></div><div><div class="mlabel">CONSTITUENTS</div><div class="mvalue" id="count">—</div></div></div></article><article class="card"><div class="cardhead"><div class="cardtitle">MARKET MOOD</div><span class="muted">Advancers vs decliners</span></div><div class="mood"><div class="donut" id="donut"><div class="donutcenter"><span id="upCount">—</span><small>stocks up</small></div></div><div class="moodlist"><div class="mooditem"><span class="bullet upbullet"></span>Gainers<b id="gainers">—</b></div><div class="mooditem"><span class="bullet downbullet"></span>Losers<b id="losers">—</b></div><div class="mooditem"><span class="bullet flatbullet"></span>Unchanged<b id="flat">—</b></div></div></div></article></section>
+<section class="tools"><div class="search"><input id="search" type="search" placeholder="⌕  Search a stock (RELIANCE, TCS…)" aria-label="Search stocks"></div><select id="sort" aria-label="Sort stocks"><option value="cap">Sort: Market cap</option><option value="change">Sort: % change</option><option value="az">Sort: Symbol A–Z</option></select><div class="legend"><span><i style="background:#00d69a"></i>Gaining</span><span><i style="background:#ff5574"></i>Declining</span><span><i style="background:#829bb4"></i>Flat</span></div><button id="refresh">↻ Refresh</button></section><div class="heathead"><h2>Constituent heatmap</h2><span class="muted" id="resultCount">0 stocks</span></div><section id="heatmap" class="heatmap" aria-live="polite"><div class="empty"><strong>Ready for market data</strong>Connect your permitted data feed to populate real stock tiles.</div></section><div id="error" class="error" hidden></div><p class="note">Prices and percentage changes are only shown when supplied by the configured JSON feed. This page does not invent live quotes. Colour represents daily percentage change. Market data may be delayed; informational use only, not investment advice.</p><footer class="footer"><span><b>MARKET ATLAS</b> · NIFTY 50 · INDIA</span><span id="updated">LAST UPDATED · NOT CONNECTED</span></footer></main></div>
+<script>
+(()=>{'use strict';const DATA_URL='./data/nifty50-heatmap.json',REFRESH_MS=60000,$=id=>document.getElementById(id);let stocks=[],busy=false,view='all';const pick=(o,keys)=>{for(const k of keys)if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=='')return o[k];return null},num=v=>{if(v==null||v==='')return null;const n=Number(v);return Number.isFinite(n)?n:null},fmt=n=>n==null?'—':Number(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2}),pct=n=>n==null?'—':`${n>0?'+':''}${n.toFixed(2)}%`;
+function parse(d){const rows=Array.isArray(d)?d:pick(d,['stocks','constituents','results','data']);if(!Array.isArray(rows))return[];return rows.map(r=>({symbol:String(pick(r,['symbol','ticker','tradingsymbol','name'])||'').trim().toUpperCase(),price:num(pick(r,['price','ltp','last_price','lastPrice','close'])),change:num(pick(r,['changePercent','change_percent','percentChange','pChange','pct_change','change_pct'])),cap:num(pick(r,['marketCap','market_cap','marketCapitalization','market_capitalization']))})).filter(s=>s.symbol&&s.price!==null)}
+function shade(c){if(c==null||Math.abs(c)<.005)return['#182b3a','#294052','flat'];const t=Math.min(Math.abs(c)/3,1);return c>0?[`rgb(7,${Math.round(52+44*t)},${Math.round(47+20*t)})`,`rgb(14,${Math.round(112+40*t)},${Math.round(88+22*t)})`,'up']:[`rgb(${Math.round(65+45*t)},22,39)`,`rgb(${Math.round(142+70*t)},38,58)`,'down']}
+function render(){const q=$('search').value.trim().toUpperCase();let list=stocks.filter(s=>(!q||s.symbol.includes(q))&&(view==='all'||(view==='gainers'?s.change>0:s.change<0)));const sort=$('sort').value;if(sort==='change')list.sort((a,b)=>(b.change??-Infinity)-(a.change??-Infinity));else if(sort==='az')list.sort((a,b)=>a.symbol.localeCompare(b.symbol));else list.sort((a,b)=>(b.cap??-Infinity)-(a.cap??-Infinity));const up=stocks.filter(s=>s.change>0).length,down=stocks.filter(s=>s.change<0).length,flat=stocks.length-up-down;$('count').textContent=stocks.length||'—';$('gainers').textContent=up;$('losers').textContent=down;$('flat').textContent=flat;$('upCount').textContent=up;$('resultCount').textContent=`${list.length} stocks`;$('donut').style.background=stocks.length?`conic-gradient(var(--green) 0 ${up/stocks.length*100}%,var(--red) ${up/stocks.length*100}% ${(up+down)/stocks.length*100}%,#829bb4 ${(up+down)/stocks.length*100}% 100%)`:'#19344a';$('heatmap').replaceChildren();if(!list.length){const e=document.createElement('div');e.className='empty';e.innerHTML=`<strong>${stocks.length?'No matching stocks':'No market data loaded yet'}</strong>${stocks.length?'Try another symbol or filter.':'The page is waiting for data/nifty50-heatmap.json. Configure the data workflow to populate the heatmap.'}`;$('heatmap').append(e);return}for(const s of list){const [bg,border,dir]=shade(s.change),tile=document.createElement('article');tile.className='tile';tile.style.setProperty('--tile',bg);tile.style.setProperty('--border',border);const symbol=document.createElement('div');symbol.className='symbol';symbol.textContent=s.symbol;const price=document.createElement('div');price.className='price';price.textContent='₹ '+fmt(s.price);const change=document.createElement('div');change.className='change '+dir;change.textContent=`${s.change>0?'▲':s.change<0?'▼':'•'} ${pct(s.change)}`;tile.append(symbol,price,change);if(s.cap!=null){const cap=document.createElement('div');cap.className='cap';cap.textContent='Market cap '+Number(s.cap).toLocaleString('en-IN',{maximumFractionDigits:1});tile.append(cap)}tile.title=`${s.symbol} · ₹${fmt(s.price)} · ${pct(s.change)}`;$('heatmap').append(tile)}}
+async function load(){if(busy)return;busy=true;$('refresh').textContent='↻ Loading…';$('error').hidden=true;try{const r=await fetch(`${DATA_URL}?_=${Date.now()}`,{cache:'no-store'});if(!r.ok)throw Error(`JSON file returned HTTP ${r.status}`);const d=await r.json(),parsed=parse(d);if(!parsed.length)throw Error('No usable stock records in JSON');stocks=parsed;$('feedState').textContent='Feed connected';const idx=num(pick(d,['indexValue','index_value','nifty50','value'])),chg=num(pick(d,['indexChangePercent','index_change_percent','indexPercentChange'])),abs=num(pick(d,['indexChange','index_change']));if(idx!==null)$('indexValue').textContent=fmt(idx);if(chg!==null){$('indexChange').textContent=`${abs===null?'':(abs>0?'+':'')+fmt(abs)+' · '}${pct(chg)}`;$('indexChange').className='changebig '+(chg>0?'positive':chg<0?'negative':'')}for(const [id,keys]of[['open',['open','indexOpen']],['high',['high','dayHigh','indexHigh']],['low',['low','dayLow','indexLow']]]){const n=num(pick(d,keys));if(n!==null)$(id).textContent=fmt(n)}const stamp=pick(d,['updatedAt','updated_at','timestamp','lastUpdated'])||new Date().toISOString(),date=new Date(stamp);$('updated').textContent='LAST UPDATED · '+(isNaN(date.getTime())?stamp:date.toLocaleString('en-IN',{timeZone:'Asia/Kolkata'}))+' IST';render()}catch(e){$('feedState').textContent='Awaiting data';$('error').hidden=false;$('error').textContent=`Data unavailable: ${e.message}. Expected ${DATA_URL}.`;if(!stocks.length)render();console.warn(e)}finally{busy=false;$('refresh').textContent='↻ Refresh'}}
+$('search').addEventListener('input',render);$('sort').addEventListener('change',render);$('refresh').addEventListener('click',load);document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{view=b.dataset.view;document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x===b));render()}));function clock(){$('clock').textContent=new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date())+' IST'}clock();setInterval(clock,1000);load();setInterval(load,REFRESH_MS)})();
+</script></body></html>
