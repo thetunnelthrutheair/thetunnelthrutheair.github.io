@@ -8,10 +8,189 @@
 <section class="grid"><article class="card"><div class="cardhead"><div class="cardtitle">NIFTY 50 INDEX</div><span class="muted">Index snapshot</span></div><div class="indexrow"><div class="indexvalue" id="indexValue">—</div><div class="changebig" id="indexChange">Waiting for data</div></div><svg class="chart" viewBox="0 0 650 100" preserveAspectRatio="none" aria-label="Decorative trend illustration"><defs><linearGradient id="area" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#00d69a" stop-opacity=".27"/><stop offset="100%" stop-color="#00d69a" stop-opacity="0"/></linearGradient></defs><path d="M0,76 L30,71 58,74 86,60 113,65 145,49 170,55 201,42 229,51 260,36 289,42 318,27 350,38 379,23 405,33 438,19 470,27 503,13 533,21 565,10 596,17 620,5 650,12 L650,100 L0,100 Z" fill="url(#area)"/><path d="M0,76 L30,71 58,74 86,60 113,65 145,49 170,55 201,42 229,51 260,36 289,42 318,27 350,38 379,23 405,33 438,19 470,27 503,13 533,21 565,10 596,17 620,5 650,12" fill="none" stroke="#00d69a" stroke-width="2.2"/></svg><div class="metrics"><div><div class="mlabel">OPEN</div><div class="mvalue" id="open">—</div></div><div><div class="mlabel">DAY HIGH</div><div class="mvalue" id="high">—</div></div><div><div class="mlabel">DAY LOW</div><div class="mvalue" id="low">—</div></div><div><div class="mlabel">CONSTITUENTS</div><div class="mvalue" id="count">—</div></div></div></article><article class="card"><div class="cardhead"><div class="cardtitle">MARKET MOOD</div><span class="muted">Advancers vs decliners</span></div><div class="mood"><div class="donut" id="donut"><div class="donutcenter"><span id="upCount">—</span><small>stocks up</small></div></div><div class="moodlist"><div class="mooditem"><span class="bullet upbullet"></span>Gainers<b id="gainers">—</b></div><div class="mooditem"><span class="bullet downbullet"></span>Losers<b id="losers">—</b></div><div class="mooditem"><span class="bullet flatbullet"></span>Unchanged<b id="flat">—</b></div></div></div></article></section>
 <section class="tools"><div class="search"><input id="search" type="search" placeholder="⌕  Search a stock (RELIANCE, TCS…)" aria-label="Search stocks"></div><select id="sort" aria-label="Sort stocks"><option value="cap">Sort: Market cap</option><option value="change">Sort: % change</option><option value="az">Sort: Symbol A–Z</option></select><div class="legend"><span><i style="background:#00d69a"></i>Gaining</span><span><i style="background:#ff5574"></i>Declining</span><span><i style="background:#829bb4"></i>Flat</span></div><button id="refresh">↻ Refresh</button></section><div class="heathead"><h2>Constituent heatmap</h2><span class="muted" id="resultCount">0 stocks</span></div><section id="heatmap" class="heatmap" aria-live="polite"><div class="empty"><strong>Ready for market data</strong>Connect your permitted data feed to populate real stock tiles.</div></section><div id="error" class="error" hidden></div><p class="note">Prices and percentage changes are only shown when supplied by the configured JSON feed. This page does not invent live quotes. Colour represents daily percentage change. Market data may be delayed; informational use only, not investment advice.</p><footer class="footer"><span><b>MARKET ATLAS</b> · NIFTY 50 · INDIA</span><span id="updated">LAST UPDATED · NOT CONNECTED</span></footer></main></div>
 <script>
-(()=>{'use strict';const DATA_URL='./data/nifty50-heatmap.json',REFRESH_MS=60000,$=id=>document.getElementById(id);let stocks=[],busy=false,view='all';const pick=(o,keys)=>{for(const k of keys)if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=='')return o[k];return null},num=v=>{if(v==null||v==='')return null;const n=Number(v);return Number.isFinite(n)?n:null},fmt=n=>n==null?'—':Number(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2}),pct=n=>n==null?'—':`${n>0?'+':''}${n.toFixed(2)}%`;
-function parse(d){const rows=Array.isArray(d)?d:pick(d,['stocks','constituents','results','data']);if(!Array.isArray(rows))return[];return rows.map(r=>({symbol:String(pick(r,['symbol','ticker','tradingsymbol','name'])||'').trim().toUpperCase(),price:num(pick(r,['price','ltp','last_price','lastPrice','close'])),change:num(pick(r,['changePercent','change_percent','percentChange','pChange','pct_change','change_pct'])),cap:num(pick(r,['marketCap','market_cap','marketCapitalization','market_capitalization']))})).filter(s=>s.symbol&&s.price!==null)}
-function shade(c){if(c==null||Math.abs(c)<.005)return['#182b3a','#294052','flat'];const t=Math.min(Math.abs(c)/3,1);return c>0?[`rgb(7,${Math.round(52+44*t)},${Math.round(47+20*t)})`,`rgb(14,${Math.round(112+40*t)},${Math.round(88+22*t)})`,'up']:[`rgb(${Math.round(65+45*t)},22,39)`,`rgb(${Math.round(142+70*t)},38,58)`,'down']}
-function render(){const q=$('search').value.trim().toUpperCase();let list=stocks.filter(s=>(!q||s.symbol.includes(q))&&(view==='all'||(view==='gainers'?s.change>0:s.change<0)));const sort=$('sort').value;if(sort==='change')list.sort((a,b)=>(b.change??-Infinity)-(a.change??-Infinity));else if(sort==='az')list.sort((a,b)=>a.symbol.localeCompare(b.symbol));else list.sort((a,b)=>(b.cap??-Infinity)-(a.cap??-Infinity));const up=stocks.filter(s=>s.change>0).length,down=stocks.filter(s=>s.change<0).length,flat=stocks.length-up-down;$('count').textContent=stocks.length||'—';$('gainers').textContent=up;$('losers').textContent=down;$('flat').textContent=flat;$('upCount').textContent=up;$('resultCount').textContent=`${list.length} stocks`;$('donut').style.background=stocks.length?`conic-gradient(var(--green) 0 ${up/stocks.length*100}%,var(--red) ${up/stocks.length*100}% ${(up+down)/stocks.length*100}%,#829bb4 ${(up+down)/stocks.length*100}% 100%)`:'#19344a';$('heatmap').replaceChildren();if(!list.length){const e=document.createElement('div');e.className='empty';e.innerHTML=`<strong>${stocks.length?'No matching stocks':'No market data loaded yet'}</strong>${stocks.length?'Try another symbol or filter.':'The page is waiting for data/nifty50-heatmap.json. Configure the data workflow to populate the heatmap.'}`;$('heatmap').append(e);return}for(const s of list){const [bg,border,dir]=shade(s.change),tile=document.createElement('article');tile.className='tile';tile.style.setProperty('--tile',bg);tile.style.setProperty('--border',border);const symbol=document.createElement('div');symbol.className='symbol';symbol.textContent=s.symbol;const price=document.createElement('div');price.className='price';price.textContent='₹ '+fmt(s.price);const change=document.createElement('div');change.className='change '+dir;change.textContent=`${s.change>0?'▲':s.change<0?'▼':'•'} ${pct(s.change)}`;tile.append(symbol,price,change);if(s.cap!=null){const cap=document.createElement('div');cap.className='cap';cap.textContent='Market cap '+Number(s.cap).toLocaleString('en-IN',{maximumFractionDigits:1});tile.append(cap)}tile.title=`${s.symbol} · ₹${fmt(s.price)} · ${pct(s.change)}`;$('heatmap').append(tile)}}
-async function load(){if(busy)return;busy=true;$('refresh').textContent='↻ Loading…';$('error').hidden=true;try{const r=await fetch(`${DATA_URL}?_=${Date.now()}`,{cache:'no-store'});if(!r.ok)throw Error(`JSON file returned HTTP ${r.status}`);const d=await r.json(),parsed=parse(d);if(!parsed.length)throw Error('No usable stock records in JSON');stocks=parsed;$('feedState').textContent='Feed connected';const idx=num(pick(d,['indexValue','index_value','nifty50','value'])),chg=num(pick(d,['indexChangePercent','index_change_percent','indexPercentChange'])),abs=num(pick(d,['indexChange','index_change']));if(idx!==null)$('indexValue').textContent=fmt(idx);if(chg!==null){$('indexChange').textContent=`${abs===null?'':(abs>0?'+':'')+fmt(abs)+' · '}${pct(chg)}`;$('indexChange').className='changebig '+(chg>0?'positive':chg<0?'negative':'')}for(const [id,keys]of[['open',['open','indexOpen']],['high',['high','dayHigh','indexHigh']],['low',['low','dayLow','indexLow']]]){const n=num(pick(d,keys));if(n!==null)$(id).textContent=fmt(n)}const stamp=pick(d,['updatedAt','updated_at','timestamp','lastUpdated'])||new Date().toISOString(),date=new Date(stamp);$('updated').textContent='LAST UPDATED · '+(isNaN(date.getTime())?stamp:date.toLocaleString('en-IN',{timeZone:'Asia/Kolkata'}))+' IST';render()}catch(e){$('feedState').textContent='Awaiting data';$('error').hidden=false;$('error').textContent=`Data unavailable: ${e.message}. Expected ${DATA_URL}.`;if(!stocks.length)render();console.warn(e)}finally{busy=false;$('refresh').textContent='↻ Refresh'}}
-$('search').addEventListener('input',render);$('sort').addEventListener('change',render);$('refresh').addEventListener('click',load);document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{view=b.dataset.view;document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x===b));render()}));function clock(){$('clock').textContent=new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date())+' IST'}clock();setInterval(clock,1000);load();setInterval(load,REFRESH_MS)})();
+(() => {
+  "use strict";
+  const CSV_URL = "./nifty50.csv";
+  const REFRESH_MS = 60000;
+  const $ = id => document.getElementById(id);
+  let stocks = [], busy = false, currentView = "all";
+
+  const fmt = n => n == null || !Number.isFinite(n) ? "—" :
+    n.toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  const number = value => {
+    if (value == null || value.trim() === "") return null;
+    const n = Number(value.replace(/,/g, ""));
+    return Number.isFinite(n) ? n : null;
+  };
+
+  // Handles standard CSV quoting, including commas inside quoted fields.
+  function parseCSV(text) {
+    const rows = [];
+    let row = [], field = "", quoted = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i], next = text[i + 1];
+      if (quoted) {
+        if (c === '"' && next === '"') { field += '"'; i++; }
+        else if (c === '"') quoted = false;
+        else field += c;
+      } else if (c === '"' && field === "") quoted = true;
+      else if (c === ",") { row.push(field.trim()); field = ""; }
+      else if (c === "\n") {
+        row.push(field.trim());
+        if (row.some(v => v !== "")) rows.push(row);
+        row = []; field = "";
+      } else if (c !== "\r") field += c;
+    }
+    row.push(field.trim());
+    if (row.some(v => v !== "")) rows.push(row);
+    if (rows.length < 2) throw new Error("CSV has no stock rows.");
+
+    const headers = rows.shift().map(h => h.replace(/^\uFEFF/, "").trim().toLowerCase());
+    const required = ["symbol", "open", "high", "low", "close", "volume"];
+    const missing = required.filter(h => !headers.includes(h));
+    if (missing.length) throw new Error("Missing CSV columns: " + missing.join(", "));
+
+    return rows.map(values => {
+      const obj = Object.fromEntries(headers.map((h, i) => [h, values[i] ?? ""]));
+      const open = number(obj.open), close = number(obj.close);
+      return {
+        symbol: (obj.symbol || "").trim().toUpperCase(),
+        open, high: number(obj.high), low: number(obj.low),
+        close, volume: number(obj.volume),
+        // With the requested columns, estimate change from today's open.
+        change: open !== null && open !== 0 && close !== null
+          ? ((close - open) / open) * 100 : null
+      };
+    }).filter(s => s.symbol && s.close !== null);
+  }
+
+  function tileColour(change) {
+    if (change == null || Math.abs(change) < .005)
+      return ["#182b3a", "#294052", "#bdccda", "flat"];
+    const t = Math.min(Math.abs(change) / 3, 1);
+    if (change > 0) return [
+      `rgb(${Math.round(7+3*t)},${Math.round(52+44*t)},${Math.round(47+20*t)})`,
+      `rgb(${Math.round(14+5*t)},${Math.round(112+40*t)},${Math.round(88+22*t)})`,
+      "#5af2be", "up"
+    ];
+    return [
+      `rgb(${Math.round(65+45*t)},${Math.round(22+3*t)},${Math.round(39+5*t)})`,
+      `rgb(${Math.round(142+70*t)},${Math.round(38+5*t)},${Math.round(58+10*t)})`,
+      "#ff879c", "down"
+    ];
+  }
+
+  function render() {
+    const query = $("search").value.trim().toUpperCase();
+    let list = stocks.filter(s => !query || s.symbol.includes(query));
+    if (currentView === "gainers") list = list.filter(s => s.change > 0);
+    if (currentView === "losers") list = list.filter(s => s.change < 0);
+    if ($("sort").value === "change") list.sort((a,b)=>(b.change ?? -Infinity)-(a.change ?? -Infinity));
+    else if ($("sort").value === "az") list.sort((a,b)=>a.symbol.localeCompare(b.symbol));
+    else list.sort((a,b)=>(b.volume ?? -Infinity)-(a.volume ?? -Infinity));
+
+    $("resultCount").textContent = `${list.length} stock${list.length === 1 ? "" : "s"}`;
+    const up = stocks.filter(s => s.change > 0).length;
+    const down = stocks.filter(s => s.change < 0).length;
+    const flat = stocks.length - up - down;
+    $("gainers").textContent = up;
+    $("losers").textContent = down;
+    $("unchanged").textContent = flat;
+    $("gainerCount").textContent = up;
+    $("metricCount").textContent = stocks.length || "—";
+    $("donut").style.background = stocks.length
+      ? `conic-gradient(var(--green) 0 ${up/stocks.length*100}%,var(--red) ${up/stocks.length*100}% ${(up+down)/stocks.length*100}%,#829bb4 ${(up+down)/stocks.length*100}% 100%)`
+      : "#18344b";
+
+    $("heatmap").replaceChildren();
+    if (!list.length) {
+      const e = document.createElement("div");
+      e.className = "empty";
+      e.innerHTML = `<strong>${stocks.length ? "No matching stocks" : "No CSV data loaded yet"}</strong>${stocks.length ? "Try another symbol or view." : "Place nifty50.csv beside index.html and make sure it contains Symbol, Open, High, Low, Close, Volume."}`;
+      $("heatmap").append(e);
+      return;
+    }
+
+    for (const s of list) {
+      const [bg, border, fg, dir] = tileColour(s.change);
+      const tile = document.createElement("article");
+      tile.className = "tile";
+      tile.style.setProperty("--tilebg", bg);
+      tile.style.setProperty("--tileborder", border);
+
+      const top = document.createElement("div"); top.className = "tiletop";
+      const sym = document.createElement("div"); sym.className = "symbol"; sym.textContent = s.symbol;
+      top.append(sym);
+
+      const price = document.createElement("div");
+      price.className = "price"; price.textContent = "₹ " + fmt(s.close);
+      const change = document.createElement("div");
+      change.className = `tilechange ${dir}`;
+      change.textContent = `${s.change > 0 ? "▲" : s.change < 0 ? "▼" : "•"} ${s.change == null ? "—" : (s.change > 0 ? "+" : "") + s.change.toFixed(2) + "%"}`;
+
+      const details = document.createElement("div");
+      details.className = "tilefoot";
+      details.textContent = `O ${fmt(s.open)} · H ${fmt(s.high)} · L ${fmt(s.low)}`;
+      const vol = document.createElement("div");
+      vol.className = "tilefoot";
+      vol.textContent = `Vol ${s.volume == null ? "—" : s.volume.toLocaleString("en-IN")}`;
+
+      tile.append(top, price, change, details, vol);
+      tile.title = `${s.symbol} | Open ${fmt(s.open)} | High ${fmt(s.high)} | Low ${fmt(s.low)} | Close ${fmt(s.close)} | Volume ${s.volume ?? "—"}`;
+      $("heatmap").append(tile);
+    }
+
+    const avg = stocks.filter(s => s.change !== null);
+    if (avg.length) {
+      const mean = avg.reduce((sum, s) => sum + s.change, 0) / avg.length;
+      $("indexChange").textContent = `${mean > 0 ? "+" : ""}${mean.toFixed(2)}% average change from open`;
+      $("indexChange").className = "changebig " + (mean > 0 ? "positive" : mean < 0 ? "negative" : "");
+    }
+  }
+
+  async function load() {
+    if (busy) return;
+    busy = true;
+    $("refresh").textContent = "↻ Loading…";
+    $("error").hidden = true;
+    try {
+      const res = await fetch(`${CSV_URL}?_=${Date.now()}`, {cache: "no-store"});
+      if (!res.ok) throw new Error(`CSV returned HTTP ${res.status}`);
+      const text = await res.text();
+      const parsed = parseCSV(text);
+      if (!parsed.length) throw new Error("CSV contains no valid stock records");
+      stocks = parsed;
+      $("marketState").textContent = "CSV data loaded";
+      $("lastUpdated").textContent = "CSV LOADED · " + new Date().toLocaleString("en-IN", {timeZone:"Asia/Kolkata"}) + " IST";
+      render();
+    } catch (err) {
+      $("marketState").textContent = "Waiting for CSV";
+      $("error").textContent = `Could not load nifty50.csv: ${err.message}. Put it in the same folder as index.html.`;
+      $("error").hidden = false;
+      if (!stocks.length) render();
+      console.warn(err);
+    } finally {
+      busy = false;
+      $("refresh").textContent = "↻ Refresh";
+    }
+  }
+
+  $("search").addEventListener("input", render);
+  $("sort").innerHTML = '<option value="volume">Sort: Volume</option><option value="change">Sort: % from open</option><option value="az">Sort: Symbol A–Z</option>';
+  $("sort").addEventListener("change", render);
+  $("refresh").addEventListener("click", load);
+  document.querySelectorAll("[data-view]").forEach(btn => btn.addEventListener("click", () => {
+    currentView = btn.dataset.view;
+    document.querySelectorAll("[data-view]").forEach(b => b.classList.toggle("active", b === btn));
+    render();
+    document.querySelector(".heathead").scrollIntoView({behavior:"smooth",block:"start"});
+  }));
+  function clock() {
+    $("clock").textContent = new Intl.DateTimeFormat("en-IN", {
+      timeZone:"Asia/Kolkata", hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false
+    }).format(new Date()) + " IST";
+  }
+  clock(); setInterval(clock, 1000);
+  load(); setInterval(load, REFRESH_MS);
+})();
 </script></body></html>
