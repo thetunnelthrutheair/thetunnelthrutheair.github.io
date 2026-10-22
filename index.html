@@ -3,122 +3,94 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101827">
-  <title>NIFTY 50 Dashboard</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NIFTY 50 index information from the official National Stock Exchange of India.">
+  <title>NIFTY 50 | Official NSE Data</title>
   <style>
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
-      font-family: system-ui, sans-serif;
-      background: #101827;
-      color: #f1f5f9;
+      font-family: Arial, sans-serif;
+      background: #f3f6fa;
+      color: #172033;
     }
-
     header {
-      padding: 28px 20px;
-      background: #182438;
-      border-bottom: 1px solid #334155;
-    }
-
-    main {
-      width: min(100% - 32px, 1000px);
-      margin: 32px auto;
-    }
-
-    h1 { margin: 8px 0; font-size: clamp(28px, 5vw, 42px); }
-    h2 { font-size: 20px; }
-
-    .brand {
-      color: #93b4ff;
-      font-size: 12px;
-      letter-spacing: 2px;
-    }
-
-    .muted { color: #a8b5c8; line-height: 1.7; }
-
-    .panel {
-      background: #182438;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 20px;
-      margin: 24px 0;
-    }
-
-    a { color: #9db8ff; }
-
-    footer {
-      padding: 24px;
+      background: #123c69;
+      color: white;
+      padding: 24px 20px;
       text-align: center;
-      color: #94a3b8;
+    }
+    main {
+      max-width: 760px;
+      margin: 48px auto;
+      padding: 20px;
+    }
+    .panel {
+      background: white;
+      border-radius: 14px;
+      padding: 30px;
+      box-shadow: 0 5px 24px #152b4612;
+      text-align: center;
+    }
+    h1 { margin-top: 0; }
+    .note {
+      color: #536176;
+      line-height: 1.7;
+    }
+    .link {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 14px 22px;
+      border-radius: 8px;
+      background: #087443;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .link:hover { background: #065d36; }
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #657187;
       font-size: 13px;
     }
   </style>
 </head>
-
 <body>
   <header>
-    <div class="brand">MARKET WATCH</div>
-    <h1>NIFTY 50 Dashboard</h1>
-    <div class="muted">Indian equity market at a glance</div>
+    <h1>NIFTY 50</h1>
+    <p>National Stock Exchange of India</p>
   </header>
 
   <main>
     <section class="panel">
-      <h2>NIFTY 50 — Market Price</h2>
-      <p class="muted">
-        Market quote and chart provided by TradingView.
-        Quotes may be delayed.
+      <h2>Official NSE Index Data</h2>
+      <p class="note">
+        View the NIFTY 50 index value, daily change, index details
+        and other available information directly on the official
+        National Stock Exchange of India website.
       </p>
-
-      <div class="tradingview-widget-container" style="width:100%">
-        <div class="tradingview-widget-container__widget"></div>
-
-        <script
-          type="text/javascript"
-          src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js"
-          async>
-        {
-          "symbols": [["NIFTY 50", "NSE:NIFTY|1D"]],
-          "chartOnly": false,
-          "width": "100%",
-          "height": 440,
-          "locale": "en",
-          "colorTheme": "dark",
-          "autosize": true,
-          "showVolume": false,
-          "hideMarketStatus": false,
-          "hideSymbolLogo": true,
-          "scalePosition": "right",
-          "scaleMode": "Normal",
-          "fontFamily": "system-ui, sans-serif",
-          "valuesTracking": "1",
-          "changeMode": "price-and-percent",
-          "chartType": "area",
-          "lineWidth": 2,
-          "lineType": 0,
-          "dateRanges": ["1d", "1m", "3m", "12m", "all"]
-        }
-        </script>
-      </div>
-      <p class="muted">
-        Data provided by
-        <a href="https://www.tradingview.com/" target="_blank"
-           rel="noopener noreferrer">TradingView</a>.
+      <a
+        class="link"
+        href="https://www.nseindia.com/static/products-services/indices-nifty50-index"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        View NIFTY 50 on NSE ↗
+      </a>
+      <p class="note">
+        Data is displayed on NSE's website. This page does not
+        independently retrieve or reproduce live market prices.
       </p>
     </section>
-
-    <p class="muted">
-      For official exchange information, visit
-      <a href="https://www.nseindia.com/" target="_blank"
-         rel="noopener noreferrer">NSE India</a>.
-      This dashboard is for information only, not investment advice.
-    </p>
   </main>
 
-  <footer>Hosted on GitHub Pages</footer>
+  <footer>
+    Market data source:
+    <a href="https://www.nseindia.com/" target="_blank"
+       rel="noopener noreferrer">NSE India</a>
+    <p>Market information may be delayed. Verify data on the official exchange.</p>
+  </footer>
 </body>
 </html>
 
