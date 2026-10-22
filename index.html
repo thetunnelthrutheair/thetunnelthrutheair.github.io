@@ -265,6 +265,14 @@
 
     button:hover { background: var(--panel2); }
 
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .tile-delivery {
+      color: #ffffffa8;
+      font-size: 10px;
+      margin-top: 2px;
+    }
+
     .summary {
       display: flex;
       gap: 18px;
@@ -447,7 +455,7 @@
       <h2>See the market at a glance.</h2>
       <p>
         Track the NIFTY 50 index and explore stock performance through
-        a visual heatmap, all powered by your published CSV file.
+        a visual heatmap, including previous close and delivery %, all powered by your CSV file.
       </p>
     </section>
 
@@ -462,9 +470,13 @@
       <div class="section-head">
         <div>
           <h2>Market heatmap</h2>
-          <p>Green indicates a positive Open-to-Close move; red indicates a negative move.</p>
+          <p>Colour shows the change from the previous close (falls back to the open if a row has no previous close).</p>
         </div>
-        <button id="refreshButton" type="button">↻ Refresh data</button>
+        <div class="actions">
+          <button id="openFileButton" type="button">📂 Open CSV file…</button>
+          <button id="refreshButton" type="button">↻ Refresh data</button>
+          <input id="fileInput" type="file" accept=".csv,text/csv" hidden>
+        </div>
       </div>
 
       <div class="toolbar">
@@ -480,6 +492,7 @@
           <option value="change-asc">Top losers first</option>
           <option value="symbol-asc">Symbol A–Z</option>
           <option value="volume-desc">Highest volume</option>
+          <option value="delivery-desc">Highest delivery %</option>
         </select>
       </div>
 
@@ -494,7 +507,7 @@
       <div class="section-head">
         <div>
           <h2>All market data</h2>
-          <p>Search and sort the rows loaded from nifty50.csv.</p>
+          <p>Every row and column of the CSV, with the NIFTY index pinned at the top.</p>
         </div>
       </div>
 
@@ -506,13 +519,15 @@
               <th>Open</th>
               <th>High</th>
               <th>Low</th>
+              <th>Prev Close</th>
               <th>Close</th>
               <th>Change</th>
               <th>Volume</th>
+              <th>Delivery %</th>
             </tr>
           </thead>
           <tbody id="tableBody">
-            <tr><td colspan="7" class="neutral">Loading CSV…</td></tr>
+            <tr><td colspan="9" class="neutral">Loading CSV…</td></tr>
           </tbody>
         </table>
       </div>
@@ -535,6 +550,7 @@
     let allRows = [];
     let lastSuccessfulUpdate = null;
     let isLoading = false;
+    let usingLocalFile = false;   // true after a CSV is opened manually
 
     const $ = (id) => document.getElementById(id);
 
@@ -593,6 +609,21 @@
         headers.map((header, index) => [header, index])
       );
 
+      // Optional columns (may be absent, or blank for some rows such as NIFTY).
+      const findCol = (names) => {
+        for (const n of names) if (n in col) return col[n];
+        return -1;
+      };
+      const prevIdx  = findCol(["prev close", "prev_close", "previous close", "prevclose"]);
+      const delivIdx = findCol(["delivery%", "delivery %", "delivery", "deliv_per"]);
+
+      const optionalNumber = (raw) => {
+        const cleaned = String(raw ?? "").replace(/[,%]/g, "").trim();
+        if (cleaned === "" || cleaned === "-") return null;
+        const n = Number(cleaned);
+        return Number.isFinite(n) ? n : null;
+      };
+
       return rows.slice(1).map((cells, index) => {
         const value = (name) => cells[col[name]] ?? "";
         const symbol = value("symbol").trim();
@@ -617,6 +648,12 @@
         const close = parseNumber(value("close"), "Close");
         const volume = parseNumber(value("volume"), "Volume");
 
+        const prevClose = prevIdx >= 0 ? optionalNumber(cells[prevIdx]) : null;
+        const delivery  = delivIdx >= 0 ? optionalNumber(cells[delivIdx]) : null;
+
+        // Day change is measured against the previous close when available.
+        const base = prevClose !== null && prevClose !== 0 ? prevClose : open;
+
         return {
           symbol,
           open,
@@ -624,7 +661,9 @@
           low,
           close,
           volume,
-          change: open === 0 ? null : ((close - open) / open) * 100
+          prevClose,
+          delivery,
+          change: base === 0 ? null : ((close - base) / base) * 100
         };
       }).filter(Boolean);
     }
@@ -648,6 +687,10 @@
         notation: "compact",
         maximumFractionDigits: 2
       }).format(value);
+    }
+
+    function formatDelivery(value) {
+      return value === null || value === undefined ? "—" : value.toFixed(2) + "%";
     }
 
     function formatChange(change) {
@@ -696,12 +739,13 @@
           </div>
           <div class="index-price">${formatNumber(indexRow.close)}</div>
           <div class="change ${cls}">
-            ${arrow} ${changeText} <span>from open</span>
+            ${arrow} ${changeText} <span>${indexRow.prevClose !== null ? "vs prev close" : "from open"}</span>
           </div>
           <div class="card-note">
-            Open ${formatNumber(indexRow.open)} ·
+            ${indexRow.prevClose !== null ? "Prev close " + formatNumber(indexRow.prevClose) + " · " : ""}Open ${formatNumber(indexRow.open)} ·
             High ${formatNumber(indexRow.high)} ·
-            Low ${formatNumber(indexRow.low)}
+            Low ${formatNumber(indexRow.low)} ·
+            Vol. ${formatVolume(indexRow.volume)}
           </div>
         </article>
 
@@ -750,6 +794,8 @@
             return a.symbol.localeCompare(b.symbol);
           case "volume-desc":
             return b.volume - a.volume;
+          case "delivery-desc":
+            return (b.delivery ?? -1) - (a.delivery ?? -1);
           case "change-desc":
           default:
             return (b.change ?? 0) - (a.change ?? 0);
@@ -763,12 +809,17 @@
       const gainers = rows.filter(row => row.change > 0).length;
       const losers = rows.filter(row => row.change < 0).length;
       const unchanged = rows.length - gainers - losers;
+      const withDel = rows.filter(row => row.delivery !== null);
+      const avgDel = withDel.length
+        ? withDel.reduce((sum, row) => sum + row.delivery, 0) / withDel.length
+        : null;
 
       $("summary").innerHTML = `
         <span>Stocks<strong>${rows.length}</strong></span>
         <span>Gainers<strong class="positive">${gainers}</strong></span>
         <span>Losers<strong class="negative">${losers}</strong></span>
         <span>Unchanged<strong>${unchanged}</strong></span>
+        <span>Avg delivery<strong>${formatDelivery(avgDel)}</strong></span>
       `;
     }
 
@@ -787,7 +838,7 @@
 
         return `
           <article class="tile ${cls}"
-            title="${escapeHTML(row.symbol)}: ${change}">
+            title="${escapeHTML(row.symbol)}: ${change} · Prev close ${row.prevClose !== null ? formatNumber(row.prevClose) : '—'} · Delivery ${formatDelivery(row.delivery)}">
             <div>
               <div class="tile-symbol">${escapeHTML(row.symbol)}</div>
               <div class="tile-price">${formatNumber(row.close)}</div>
@@ -795,32 +846,49 @@
             <div>
               <div class="tile-change">${change}</div>
               <div class="tile-volume">Vol. ${formatVolume(row.volume)}</div>
+              <div class="tile-delivery">Del. ${formatDelivery(row.delivery)}</div>
             </div>
           </article>
         `;
       }).join("");
     }
 
-    function renderTable(rows) {
-      const body = $("tableBody");
-
-      if (!rows.length) {
-        body.innerHTML =
-          '<tr><td colspan="7" class="neutral">No matching stocks.</td></tr>';
-        return;
-      }
-
-      body.innerHTML = rows.map(row => `
-        <tr>
-          <td class="symbol-cell">${escapeHTML(row.symbol)}</td>
+    function rowHTML(row, isIdx = false) {
+      return `
+        <tr${isIdx ? ' style="background:#ffffff08"' : ''}>
+          <td class="symbol-cell">${escapeHTML(row.symbol)}${isIdx ? ' <span class="tag">INDEX</span>' : ''}</td>
           <td>${formatNumber(row.open)}</td>
           <td>${formatNumber(row.high)}</td>
           <td>${formatNumber(row.low)}</td>
+          <td>${row.prevClose !== null ? formatNumber(row.prevClose) : "—"}</td>
           <td><strong>${formatNumber(row.close)}</strong></td>
           <td class="${changeClass(row.change)}">${formatChange(row.change)}</td>
           <td>${formatVolume(row.volume)}</td>
+          <td>${formatDelivery(row.delivery)}</td>
         </tr>
-      `).join("");
+      `;
+    }
+
+    function renderTable(rows, indexRow) {
+      const body = $("tableBody");
+      const query = $("searchInput").value.trim().toUpperCase();
+      const showIndex = indexRow &&
+        (query === "" || indexRow.symbol.toUpperCase().includes(query));
+
+      if (!rows.length && showIndex) {
+        body.innerHTML = rowHTML(indexRow, true);
+        return;
+      }
+
+      if (!rows.length) {
+        body.innerHTML =
+          '<tr><td colspan="9" class="neutral">No matching stocks.</td></tr>';
+        return;
+      }
+
+      body.innerHTML =
+        (showIndex ? rowHTML(indexRow, true) : "") +
+        rows.map(row => rowHTML(row)).join("");
     }
 
     function escapeHTML(value) {
@@ -835,15 +903,58 @@
 
     function render() {
       const visibleRows = getVisibleRows();
-      renderIndex(allRows.find(isIndex));
+      const indexRow = allRows.find(isIndex);
+      renderIndex(indexRow);
       renderSummary(visibleRows);
       renderHeatmap(visibleRows);
-      renderTable(visibleRows);
+      renderTable(visibleRows, indexRow);
+    }
+
+    function applyCSV(text, sourceLabel) {
+      const parsed = parseCSV(text);
+
+      if (!parsed.length) {
+        throw new Error("The CSV contains no usable rows.");
+      }
+
+      allRows = parsed;
+      lastSuccessfulUpdate = new Date();
+
+      render();
+      setStatus(sourceLabel + " · " + allRows.length + " rows");
+      $("lastUpdated").textContent =
+        "Last loaded: " + lastSuccessfulUpdate.toLocaleString();
+    }
+
+    function showLoadError(error) {
+      console.error("CSV loading error:", error);
+      setStatus("CSV loading failed", "error");
+
+      // Keep the last successful data visible if a refresh fails.
+      if (!allRows.length) {
+        $("indexCards").innerHTML =
+          '<div class="card"><div class="message error">' +
+          escapeHTML(error.message) +
+          '<br><br>Check that ' + escapeHTML(CSV_URL.replace("./", "")) +
+          ' is beside index.html and uses the columns ' +
+          'Symbol, Open, High, Low, Close, Prev Close, Volume, Delivery%.' +
+          '<br>If you opened this page directly from disk, use “Open CSV file…”.' +
+          '</div></div>';
+
+        $("heatmap").innerHTML =
+          '<div class="message error">' +
+          escapeHTML(error.message) + '</div>';
+
+        $("tableBody").innerHTML =
+          '<tr><td colspan="9" class="neutral">' +
+          'Unable to load market data.</td></tr>';
+      }
     }
 
     async function loadCSV() {
       if (isLoading) return;
       isLoading = true;
+      usingLocalFile = false;
       setStatus("Loading CSV…", "loading");
 
       try {
@@ -859,53 +970,42 @@
           );
         }
 
-        const text = await response.text();
-        const parsed = parseCSV(text);
-
-        if (!parsed.length) {
-          throw new Error("The CSV contains no usable rows.");
-        }
-
-        allRows = parsed;
-        lastSuccessfulUpdate = new Date();
-
-        render();
-        setStatus("CSV loaded · " + allRows.length + " rows");
-        $("lastUpdated").textContent =
-          "Last fetched: " + lastSuccessfulUpdate.toLocaleString();
-
+        applyCSV(await response.text(), "CSV loaded");
       } catch (error) {
-        console.error("CSV loading error:", error);
-        setStatus("CSV loading failed", "error");
-
-        // Keep the last successful data visible if a refresh fails.
-        if (!allRows.length) {
-          $("indexCards").innerHTML =
-            '<div class="card"><div class="message error">' +
-            escapeHTML(error.message) +
-            '<br><br>Check that nifty50.csv is published beside index.html ' +
-            'and uses the required column names.' +
-            '</div></div>';
-
-          $("heatmap").innerHTML =
-            '<div class="message error">' +
-            escapeHTML(error.message) + '</div>';
-
-          $("tableBody").innerHTML =
-            '<tr><td colspan="7" class="neutral">' +
-            'Unable to load market data.</td></tr>';
-        }
+        showLoadError(error);
       } finally {
         isLoading = false;
       }
     }
 
+    function loadLocalFile(file) {
+      if (!file) return;
+      setStatus("Reading " + file.name + "…", "loading");
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          applyCSV(String(reader.result), file.name);
+          usingLocalFile = true;   // pause auto-refresh while viewing a manual file
+        } catch (error) {
+          showLoadError(error);
+        }
+      };
+      reader.onerror = () => showLoadError(new Error("Could not read " + file.name + "."));
+      reader.readAsText(file);
+    }
+
     $("searchInput").addEventListener("input", render);
     $("sortSelect").addEventListener("change", render);
     $("refreshButton").addEventListener("click", loadCSV);
+    $("openFileButton").addEventListener("click", () => $("fileInput").click());
+    $("fileInput").addEventListener("change", (event) => {
+      loadLocalFile(event.target.files[0]);
+      event.target.value = "";   // allow re-selecting the same file later
+    });
 
     loadCSV();
-    setInterval(loadCSV, REFRESH_INTERVAL);
+    setInterval(() => { if (!usingLocalFile) loadCSV(); }, REFRESH_INTERVAL);
   </script>
 </body>
 </html>
