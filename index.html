@@ -1,196 +1,912 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#06111f"><title>Market Atlas — NIFTY 50</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
-:root{color-scheme:dark;--bg:#050d18;--panel:#0a1929;--line:#18344b;--text:#edf6ff;--muted:#91a9bd;--green:#00d69a;--red:#ff5574;--blue:#59d7ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 72% 0%,#183550 0,transparent 38%),var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}.app{display:grid;grid-template-columns:215px minmax(0,1fr);min-height:100vh}.side{border-right:1px solid var(--line);padding:24px 15px;display:flex;flex-direction:column;background:#06111fe8}.brand{display:flex;gap:10px;align-items:center;padding:0 6px 25px;border-bottom:1px solid #132b40}.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#60e7ff,#157bc4);display:grid;place-items:center;color:#041421;font-size:23px;font-weight:800}.brand b{font:800 16px Manrope}.brand small{display:block;color:var(--muted);font-size:10px;margin-top:3px}.nav{display:grid;gap:7px;margin-top:23px}.nav button{border:1px solid transparent;background:none;color:#b5c8d9;text-align:left;padding:12px;border-radius:11px;font-size:13px;cursor:pointer}.nav button.active,.nav button:hover{background:linear-gradient(90deg,#12314a,#0c2135);border-color:#20445f;color:white}.nav span{display:inline-block;width:25px;color:var(--blue)}.quote{margin-top:auto;padding:20px 8px 0;color:#91a9bd;font-size:12px;line-height:1.8;font-style:italic}.quote b{display:block;font-style:normal;color:#d8e8f6;margin-top:10px;font-weight:500}main{min-width:0;padding:27px clamp(14px,3vw,40px) 22px}.hero{position:relative;overflow:hidden;border:1px solid #21465f;border-radius:22px;min-height:175px;padding:29px;background:linear-gradient(100deg,#0b1c2e 2%,#102b43dd 49%,#102b4355),radial-gradient(ellipse at 82% 25%,#fb9d8a66,transparent 22%),linear-gradient(145deg,#102e48,#081321 70%);margin-bottom:17px}.hero:before{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#06111f 0%,transparent 55%),repeating-linear-gradient(160deg,transparent 0 42px,#8edfff08 43px 44px)}.heroContent{position:relative;max-width:700px}.eyebrow{color:var(--blue);text-transform:uppercase;letter-spacing:2.4px;font-size:10px;font-weight:700}h1{font:700 clamp(29px,4vw,44px) Manrope;letter-spacing:-1.4px;margin:9px 0 4px}.hero p{margin:0;color:#b5c9d9}.tagline{margin-top:15px!important;color:#d3e8f8!important;font-size:15px}.pill{position:absolute;right:20px;top:20px;border:1px solid #45617b;background:#061522aa;padding:9px 12px;border-radius:30px;color:#c3d6e5;font-size:11px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);margin-right:7px}.grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(240px,.8fr);gap:15px}.card{background:linear-gradient(145deg,#0c2032,#081624);border:1px solid var(--line);border-radius:17px;padding:19px;min-width:0}.cardhead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:14px}.cardtitle{font:700 13px Manrope}.muted{font-size:11px;color:var(--muted)}.indexrow{display:flex;align-items:flex-end;gap:13px;flex-wrap:wrap}.indexvalue{font:800 clamp(30px,4vw,42px) Manrope;letter-spacing:-1.5px}.positive{color:var(--green)}.negative{color:var(--red)}.changebig{font:600 13px 'DM Mono';padding-bottom:7px}.chart{height:75px;width:100%;margin-top:9px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;border-top:1px solid var(--line);padding-top:14px;margin-top:5px}.mlabel{font-size:10px;color:var(--muted);margin-bottom:6px}.mvalue{font:500 13px 'DM Mono'}.mood{display:flex;align-items:center;gap:16px}.donut{width:88px;height:88px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;position:relative;background:#19344a}.donut:before{content:'';position:absolute;inset:8px;border-radius:50%;background:#0a1929}.donutcenter{position:relative;text-align:center;font:700 23px Manrope}.donutcenter small{display:block;font:10px 'DM Mono';color:var(--muted)}.moodlist{flex:1;display:grid;gap:13px}.mooditem{display:flex;align-items:center;gap:8px;font-size:12px;color:#c3d5e4}.mooditem b{margin-left:auto;font:500 12px 'DM Mono';color:white}.bullet{width:8px;height:8px;border-radius:3px}.upbullet{background:var(--green)}.downbullet{background:var(--red)}.flatbullet{background:#829bb4}.tools{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:19px 0 13px}.search{position:relative;flex:1;min-width:180px}.search input{width:100%;background:#0a1b2c;border:1px solid var(--line);border-radius:11px;padding:11px 13px;color:white;outline:none}.search input:focus{border-color:#3d9cc4}.tools select,.tools button{background:#0a1b2c;border:1px solid var(--line);color:#c6d9e8;border-radius:11px;padding:11px 12px;font-size:12px;cursor:pointer}.legend{display:flex;gap:11px;align-items:center;color:var(--muted);font-size:11px}.legend i{width:9px;height:9px;border-radius:3px;display:inline-block;margin-right:4px}.heathead{display:flex;justify-content:space-between;align-items:center;margin:15px 2px 12px}.heathead h2{font:700 17px Manrope;margin:0}.heatmap{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}.tile{min-width:0;text-align:left;padding:11px 10px;border:1px solid var(--border);border-radius:10px;background:linear-gradient(145deg,var(--tile),#071b28);color:white;min-height:98px;display:flex;flex-direction:column;justify-content:space-between;transition:transform .15s,filter .15s;overflow:hidden}.tile:hover{transform:translateY(-2px);filter:brightness(1.17);border-color:#a3d9f1}.symbol{font-size:11px;font-weight:800;overflow-wrap:anywhere}.price{font:600 12px 'DM Mono';margin-top:10px;white-space:nowrap}.change{font:500 11px 'DM Mono';margin-top:5px}.change.up{color:#52f2bb}.change.down{color:#ff879c}.change.flat{color:#bdccda}.cap{font-size:9px;color:#c0d8d5a8;margin-top:7px}.empty{grid-column:1/-1;border:1px dashed #25465f;border-radius:15px;padding:32px 18px;text-align:center;color:var(--muted);line-height:1.7}.empty strong{display:block;color:#eaf6ff;font:700 16px Manrope;margin-bottom:7px}.error{color:#ffb2bf;font-size:12px;margin-top:10px}.note{margin:15px 2px 0;color:#728ba1;font-size:10px;line-height:1.7}.footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid #152d42;margin-top:23px;padding:17px 2px 0;color:#69849a;font-size:10px;letter-spacing:.8px}.footer b{color:#a6bfd1;font-weight:500}@media(max-width:1120px){.app{grid-template-columns:175px minmax(0,1fr)}.heatmap{grid-template-columns:repeat(5,minmax(0,1fr))}.grid{grid-template-columns:1fr}}@media(max-width:740px){.app{display:block}.side{padding:12px;border-right:0;border-bottom:1px solid var(--line)}.brand{padding:0 4px 8px;border:0}.nav{display:flex;overflow:auto;margin-top:7px}.nav button{white-space:nowrap;padding:9px}.quote{display:none}main{padding:14px 11px}.hero{padding:22px 17px;min-height:165px}.pill{position:relative;display:inline-block;top:auto;right:auto;margin-top:14px}.metrics{grid-template-columns:repeat(2,1fr);row-gap:13px}.heatmap{grid-template-columns:repeat(3,minmax(0,1fr))}.tile{min-height:91px;padding:9px 8px}.legend{width:100%;padding:4px 0}}@media(max-width:430px){.heatmap{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:14px}.indexvalue{font-size:30px}.mood{gap:11px}.donut{width:78px;height:78px}}
-</style></head><body><div class="app"><aside class="side"><div class="brand"><div class="logo">⌁</div><div><b>MARKET ATLAS</b><small>Indian markets. Beautifully.</small></div></div><nav class="nav"><button class="active" data-view="all"><span>⌂</span>Overview</button><button data-view="all"><span>▦</span>Heatmap</button><button data-view="gainers"><span>↗</span>Top gainers</button><button data-view="losers"><span>↘</span>Top losers</button></nav><div class="quote">“The stock market is a device for transferring money from the impatient to the patient.”<b>— Warren Buffett</b></div></aside>
-<main><section class="hero"><div class="heroContent"><div class="eyebrow">India · National Stock Exchange</div><h1>NIFTY 50</h1><p>India's benchmark. Fifty companies. One market.</p><p class="tagline">Clarity in every market move.</p></div><div class="pill"><span class="dot"></span><span id="feedState">Awaiting data feed</span> · <span id="clock">--:--:-- IST</span></div></section>
-<section class="grid"><article class="card"><div class="cardhead"><div class="cardtitle">NIFTY 50 INDEX</div><span class="muted">Index snapshot</span></div><div class="indexrow"><div class="indexvalue" id="indexValue">—</div><div class="changebig" id="indexChange">Waiting for data</div></div><svg class="chart" viewBox="0 0 650 100" preserveAspectRatio="none" aria-label="Decorative trend illustration"><defs><linearGradient id="area" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#00d69a" stop-opacity=".27"/><stop offset="100%" stop-color="#00d69a" stop-opacity="0"/></linearGradient></defs><path d="M0,76 L30,71 58,74 86,60 113,65 145,49 170,55 201,42 229,51 260,36 289,42 318,27 350,38 379,23 405,33 438,19 470,27 503,13 533,21 565,10 596,17 620,5 650,12 L650,100 L0,100 Z" fill="url(#area)"/><path d="M0,76 L30,71 58,74 86,60 113,65 145,49 170,55 201,42 229,51 260,36 289,42 318,27 350,38 379,23 405,33 438,19 470,27 503,13 533,21 565,10 596,17 620,5 650,12" fill="none" stroke="#00d69a" stroke-width="2.2"/></svg><div class="metrics"><div><div class="mlabel">OPEN</div><div class="mvalue" id="open">—</div></div><div><div class="mlabel">DAY HIGH</div><div class="mvalue" id="high">—</div></div><div><div class="mlabel">DAY LOW</div><div class="mvalue" id="low">—</div></div><div><div class="mlabel">CONSTITUENTS</div><div class="mvalue" id="count">—</div></div></div></article><article class="card"><div class="cardhead"><div class="cardtitle">MARKET MOOD</div><span class="muted">Advancers vs decliners</span></div><div class="mood"><div class="donut" id="donut"><div class="donutcenter"><span id="upCount">—</span><small>stocks up</small></div></div><div class="moodlist"><div class="mooditem"><span class="bullet upbullet"></span>Gainers<b id="gainers">—</b></div><div class="mooditem"><span class="bullet downbullet"></span>Losers<b id="losers">—</b></div><div class="mooditem"><span class="bullet flatbullet"></span>Unchanged<b id="flat">—</b></div></div></div></article></section>
-<section class="tools"><div class="search"><input id="search" type="search" placeholder="⌕  Search a stock (RELIANCE, TCS…)" aria-label="Search stocks"></div><select id="sort" aria-label="Sort stocks"><option value="cap">Sort: Market cap</option><option value="change">Sort: % change</option><option value="az">Sort: Symbol A–Z</option></select><div class="legend"><span><i style="background:#00d69a"></i>Gaining</span><span><i style="background:#ff5574"></i>Declining</span><span><i style="background:#829bb4"></i>Flat</span></div><button id="refresh">↻ Refresh</button></section><div class="heathead"><h2>Constituent heatmap</h2><span class="muted" id="resultCount">0 stocks</span></div><section id="heatmap" class="heatmap" aria-live="polite"><div class="empty"><strong>Ready for market data</strong>Connect your permitted data feed to populate real stock tiles.</div></section><div id="error" class="error" hidden></div><p class="note">Prices and percentage changes are only shown when supplied by the configured JSON feed. This page does not invent live quotes. Colour represents daily percentage change. Market data may be delayed; informational use only, not investment advice.</p><footer class="footer"><span><b>MARKET ATLAS</b> · NIFTY 50 · INDIA</span><span id="updated">LAST UPDATED · NOT CONNECTED</span></footer></main></div>
-<script>
-(() => {
-  "use strict";
-  const CSV_URL = "./nifty50.csv";
-  const REFRESH_MS = 60000;
-  const $ = id => document.getElementById(id);
-  let stocks = [], busy = false, currentView = "all";
 
-  const fmt = n => n == null || !Number.isFinite(n) ? "—" :
-    n.toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2});
-  const number = value => {
-    if (value == null || value.trim() === "") return null;
-    const n = Number(value.replace(/,/g, ""));
-    return Number.isFinite(n) ? n : null;
-  };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1020">
+  <title>Market Atlas — Indian Markets</title>
 
-  // Handles standard CSV quoting, including commas inside quoted fields.
-  function parseCSV(text) {
-    const rows = [];
-    let row = [], field = "", quoted = false;
-    for (let i = 0; i < text.length; i++) {
-      const c = text[i], next = text[i + 1];
-      if (quoted) {
-        if (c === '"' && next === '"') { field += '"'; i++; }
-        else if (c === '"') quoted = false;
-        else field += c;
-      } else if (c === '"' && field === "") quoted = true;
-      else if (c === ",") { row.push(field.trim()); field = ""; }
-      else if (c === "\n") {
-        row.push(field.trim());
-        if (row.some(v => v !== "")) rows.push(row);
-        row = []; field = "";
-      } else if (c !== "\r") field += c;
-    }
-    row.push(field.trim());
-    if (row.some(v => v !== "")) rows.push(row);
-    if (rows.length < 2) throw new Error("CSV has no stock rows.");
-
-    const headers = rows.shift().map(h => h.replace(/^\uFEFF/, "").trim().toLowerCase());
-    const required = ["symbol", "open", "high", "low", "close", "volume"];
-    const missing = required.filter(h => !headers.includes(h));
-    if (missing.length) throw new Error("Missing CSV columns: " + missing.join(", "));
-
-    return rows.map(values => {
-      const obj = Object.fromEntries(headers.map((h, i) => [h, values[i] ?? ""]));
-      const open = number(obj.open), close = number(obj.close);
-      return {
-        symbol: (obj.symbol || "").trim().toUpperCase(),
-        open, high: number(obj.high), low: number(obj.low),
-        close, volume: number(obj.volume),
-        // With the requested columns, estimate change from today's open.
-        change: open !== null && open !== 0 && close !== null
-          ? ((close - open) / open) * 100 : null
-      };
-    }).filter(s => s.symbol && s.close !== null);
-  }
-
-  function tileColour(change) {
-    if (change == null || Math.abs(change) < .005)
-      return ["#182b3a", "#294052", "#bdccda", "flat"];
-    const t = Math.min(Math.abs(change) / 3, 1);
-    if (change > 0) return [
-      `rgb(${Math.round(7+3*t)},${Math.round(52+44*t)},${Math.round(47+20*t)})`,
-      `rgb(${Math.round(14+5*t)},${Math.round(112+40*t)},${Math.round(88+22*t)})`,
-      "#5af2be", "up"
-    ];
-    return [
-      `rgb(${Math.round(65+45*t)},${Math.round(22+3*t)},${Math.round(39+5*t)})`,
-      `rgb(${Math.round(142+70*t)},${Math.round(38+5*t)},${Math.round(58+10*t)})`,
-      "#ff879c", "down"
-    ];
-  }
-
-  function render() {
-    const query = $("search").value.trim().toUpperCase();
-    let list = stocks.filter(s => !query || s.symbol.includes(query));
-    if (currentView === "gainers") list = list.filter(s => s.change > 0);
-    if (currentView === "losers") list = list.filter(s => s.change < 0);
-    if ($("sort").value === "change") list.sort((a,b)=>(b.change ?? -Infinity)-(a.change ?? -Infinity));
-    else if ($("sort").value === "az") list.sort((a,b)=>a.symbol.localeCompare(b.symbol));
-    else list.sort((a,b)=>(b.volume ?? -Infinity)-(a.volume ?? -Infinity));
-
-    $("resultCount").textContent = `${list.length} stock${list.length === 1 ? "" : "s"}`;
-    const up = stocks.filter(s => s.change > 0).length;
-    const down = stocks.filter(s => s.change < 0).length;
-    const flat = stocks.length - up - down;
-    $("gainers").textContent = up;
-    $("losers").textContent = down;
-    $("unchanged").textContent = flat;
-    $("gainerCount").textContent = up;
-    $("metricCount").textContent = stocks.length || "—";
-    $("donut").style.background = stocks.length
-      ? `conic-gradient(var(--green) 0 ${up/stocks.length*100}%,var(--red) ${up/stocks.length*100}% ${(up+down)/stocks.length*100}%,#829bb4 ${(up+down)/stocks.length*100}% 100%)`
-      : "#18344b";
-
-    $("heatmap").replaceChildren();
-    if (!list.length) {
-      const e = document.createElement("div");
-      e.className = "empty";
-      e.innerHTML = `<strong>${stocks.length ? "No matching stocks" : "No CSV data loaded yet"}</strong>${stocks.length ? "Try another symbol or view." : "Place nifty50.csv beside index.html and make sure it contains Symbol, Open, High, Low, Close, Volume."}`;
-      $("heatmap").append(e);
-      return;
+  <style>
+    :root {
+      --bg: #090e1b;
+      --panel: #11182a;
+      --panel2: #151e32;
+      --border: #273149;
+      --text: #edf2ff;
+      --muted: #8996b2;
+      --green: #26d69a;
+      --red: #ff657c;
+      --blue: #8ca8ff;
     }
 
-    for (const s of list) {
-      const [bg, border, fg, dir] = tileColour(s.change);
-      const tile = document.createElement("article");
-      tile.className = "tile";
-      tile.style.setProperty("--tilebg", bg);
-      tile.style.setProperty("--tileborder", border);
+    * { box-sizing: border-box; }
 
-      const top = document.createElement("div"); top.className = "tiletop";
-      const sym = document.createElement("div"); sym.className = "symbol"; sym.textContent = s.symbol;
-      top.append(sym);
-
-      const price = document.createElement("div");
-      price.className = "price"; price.textContent = "₹ " + fmt(s.close);
-      const change = document.createElement("div");
-      change.className = `tilechange ${dir}`;
-      change.textContent = `${s.change > 0 ? "▲" : s.change < 0 ? "▼" : "•"} ${s.change == null ? "—" : (s.change > 0 ? "+" : "") + s.change.toFixed(2) + "%"}`;
-
-      const details = document.createElement("div");
-      details.className = "tilefoot";
-      details.textContent = `O ${fmt(s.open)} · H ${fmt(s.high)} · L ${fmt(s.low)}`;
-      const vol = document.createElement("div");
-      vol.className = "tilefoot";
-      vol.textContent = `Vol ${s.volume == null ? "—" : s.volume.toLocaleString("en-IN")}`;
-
-      tile.append(top, price, change, details, vol);
-      tile.title = `${s.symbol} | Open ${fmt(s.open)} | High ${fmt(s.high)} | Low ${fmt(s.low)} | Close ${fmt(s.close)} | Volume ${s.volume ?? "—"}`;
-      $("heatmap").append(tile);
+    body {
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 10% 0%, #182547 0%, transparent 38%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
     }
 
-    const avg = stocks.filter(s => s.change !== null);
-    if (avg.length) {
-      const mean = avg.reduce((sum, s) => sum + s.change, 0) / avg.length;
-      $("indexChange").textContent = `${mean > 0 ? "+" : ""}${mean.toFixed(2)}% average change from open`;
-      $("indexChange").className = "changebig " + (mean > 0 ? "positive" : mean < 0 ? "negative" : "");
+    .container {
+      max-width: 1440px;
+      margin: auto;
+      padding: 30px 24px 50px;
     }
-  }
 
-  async function load() {
-    if (busy) return;
-    busy = true;
-    $("refresh").textContent = "↻ Loading…";
-    $("error").hidden = true;
-    try {
-      const res = await fetch(`${CSV_URL}?_=${Date.now()}`, {cache: "no-store"});
-      if (!res.ok) throw new Error(`CSV returned HTTP ${res.status}`);
-      const text = await res.text();
-      const parsed = parseCSV(text);
-      if (!parsed.length) throw new Error("CSV contains no valid stock records");
-      stocks = parsed;
-      $("marketState").textContent = "CSV data loaded";
-      $("lastUpdated").textContent = "CSV LOADED · " + new Date().toLocaleString("en-IN", {timeZone:"Asia/Kolkata"}) + " IST";
-      render();
-    } catch (err) {
-      $("marketState").textContent = "Waiting for CSV";
-      $("error").textContent = `Could not load nifty50.csv: ${err.message}. Put it in the same folder as index.html.`;
-      $("error").hidden = false;
-      if (!stocks.length) render();
-      console.warn(err);
-    } finally {
-      busy = false;
-      $("refresh").textContent = "↻ Refresh";
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding-bottom: 26px;
+      border-bottom: 1px solid var(--border);
     }
-  }
 
-  $("search").addEventListener("input", render);
-  $("sort").innerHTML = '<option value="volume">Sort: Volume</option><option value="change">Sort: % from open</option><option value="az">Sort: Symbol A–Z</option>';
-  $("sort").addEventListener("change", render);
-  $("refresh").addEventListener("click", load);
-  document.querySelectorAll("[data-view]").forEach(btn => btn.addEventListener("click", () => {
-    currentView = btn.dataset.view;
-    document.querySelectorAll("[data-view]").forEach(b => b.classList.toggle("active", b === btn));
-    render();
-    document.querySelector(".heathead").scrollIntoView({behavior:"smooth",block:"start"});
-  }));
-  function clock() {
-    $("clock").textContent = new Intl.DateTimeFormat("en-IN", {
-      timeZone:"Asia/Kolkata", hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false
-    }).format(new Date()) + " IST";
-  }
-  clock(); setInterval(clock, 1000);
-  load(); setInterval(load, REFRESH_MS);
-})();
-</script></body></html>
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #7394ff, #9a76ff);
+      color: white;
+      font-size: 24px;
+      font-weight: 900;
+      box-shadow: 0 8px 30px #758fff30;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 23px;
+      letter-spacing: -0.8px;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--muted);
+      font-size: 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 10px 14px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 12px #26d69a80;
+    }
+
+    .dot.error { background: var(--red); box-shadow: none; }
+    .dot.loading { background: #f3c76a; box-shadow: none; }
+
+    .eyebrow {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      padding: 35px 0 25px;
+    }
+
+    .hero h2 {
+      margin: 10px 0;
+      font-size: clamp(27px, 4vw, 42px);
+      letter-spacing: -1.7px;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 650px;
+      line-height: 1.7;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .index-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin: 22px 0 28px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, #151e32, #101728);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      min-width: 0;
+    }
+
+    .index-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .index-card::after {
+      content: "";
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      right: -45px;
+      bottom: -65px;
+      border-radius: 50%;
+      background: #839bff12;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .index-name {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .tag {
+      color: var(--blue);
+      background: #819aff16;
+      border: 1px solid #819aff2a;
+      border-radius: 20px;
+      padding: 5px 9px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .index-price {
+      font-size: clamp(26px, 3vw, 34px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-top: 20px;
+      overflow-wrap: anywhere;
+    }
+
+    .change {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 750;
+      margin-top: 9px;
+    }
+
+    .positive { color: var(--green); }
+    .negative { color: var(--red); }
+    .neutral { color: var(--muted); }
+
+    .card-note {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 15px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 34px 0 17px;
+    }
+
+    .section-head h2 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      letter-spacing: -0.6px;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    input, select, button {
+      font: inherit;
+      color: var(--text);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 13px;
+      outline: none;
+    }
+
+    input {
+      flex: 1;
+      min-width: 190px;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--blue);
+    }
+
+    button {
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    button:hover { background: var(--panel2); }
+
+    .summary {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      padding: 14px 16px;
+      background: #101729;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .summary strong {
+      color: var(--text);
+      margin-left: 4px;
+    }
+
+    .heatmap {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .tile {
+      min-height: 112px;
+      padding: 13px;
+      border-radius: 12px;
+      border: 1px solid #ffffff12;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      overflow: hidden;
+      transition: transform .16s ease, border-color .16s ease;
+    }
+
+    .tile:hover {
+      transform: translateY(-2px);
+      border-color: #ffffff55;
+    }
+
+    .tile.up {
+      background: linear-gradient(145deg, #0e6048, #104433);
+    }
+
+    .tile.down {
+      background: linear-gradient(145deg, #762f43, #512536);
+    }
+
+    .tile.flat {
+      background: linear-gradient(145deg, #34405b, #242e45);
+    }
+
+    .tile-symbol {
+      font-size: 13px;
+      font-weight: 850;
+      overflow-wrap: anywhere;
+    }
+
+    .tile-price {
+      font-size: 12px;
+      color: #ffffffbf;
+      margin-top: 5px;
+    }
+
+    .tile-change {
+      font-size: 20px;
+      font-weight: 850;
+      letter-spacing: -0.5px;
+    }
+
+    .tile-volume {
+      color: #ffffffa8;
+      font-size: 10px;
+      margin-top: 5px;
+    }
+
+    .table-wrap {
+      margin-top: 28px;
+      overflow-x: auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    th, td {
+      padding: 15px 17px;
+      text-align: right;
+      border-bottom: 1px solid #273149a0;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 750;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+    }
+
+    th:first-child, td:first-child { text-align: left; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #ffffff05; }
+
+    .symbol-cell { font-weight: 800; }
+
+    .message {
+      padding: 25px;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
+      font-size: 13px;
+    }
+
+    .message.error { color: #ff9aa9; }
+
+    footer {
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+      padding-top: 20px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.8;
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1000px) {
+      .heatmap { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 700px) {
+      .container { padding: 20px 14px 35px; }
+      .index-grid { grid-template-columns: 1fr; }
+      .heatmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tile { min-height: 105px; }
+      .hero { padding-top: 28px; }
+      .section-head h2 { font-size: 20px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">M</div>
+        <div>
+          <h1>Market Atlas</h1>
+          <div class="subtitle">Indian equity market dashboard</div>
+        </div>
+      </div>
+
+      <div class="status" aria-live="polite">
+        <span id="statusDot" class="dot loading"></span>
+        <span id="statusText">Loading market data…</span>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">Market overview / India</div>
+      <h2>See the market at a glance.</h2>
+      <p>
+        Track the NIFTY 50 index and explore stock performance through
+        a visual heatmap, all powered by your published CSV file.
+      </p>
+    </section>
+
+    <section aria-label="Index overview">
+      <div class="eyebrow">Major index</div>
+      <div id="indexCards" class="index-grid">
+        <div class="card"><div class="message">Waiting for CSV data…</div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Market heatmap</h2>
+          <p>Green indicates a positive Open-to-Close move; red indicates a negative move.</p>
+        </div>
+        <button id="refreshButton" type="button">↻ Refresh data</button>
+      </div>
+
+      <div class="toolbar">
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Search stocks…"
+          aria-label="Search stocks"
+        >
+
+        <select id="sortSelect" aria-label="Sort stocks">
+          <option value="change-desc">Top gainers first</option>
+          <option value="change-asc">Top losers first</option>
+          <option value="symbol-asc">Symbol A–Z</option>
+          <option value="volume-desc">Highest volume</option>
+        </select>
+      </div>
+
+      <div id="summary" class="summary">
+        <span>Stocks<strong>—</strong></span>
+      </div>
+
+      <div id="heatmap" class="heatmap">
+        <div class="message">Loading stock heatmap…</div>
+      </div>
+
+      <div class="section-head">
+        <div>
+          <h2>All market data</h2>
+          <p>Search and sort the rows loaded from nifty50.csv.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Open</th>
+              <th>High</th>
+              <th>Low</th>
+              <th>Close</th>
+              <th>Change</th>
+              <th>Volume</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="7" class="neutral">Loading CSV…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>
+      <span>Market Atlas · CSV-powered dashboard</span>
+      <span id="lastUpdated">Last updated: —</span>
+      <span>Data freshness depends on the CSV you publish.</span>
+    </footer>
+  </main>
+
+  <script>
+    "use strict";
+
+    // The CSV must be in the same folder as this index.html.
+    const CSV_URL = "./nifty50.csv";
+    const REFRESH_INTERVAL = 60_000;
+
+    let allRows = [];
+    let lastSuccessfulUpdate = null;
+    let isLoading = false;
+
+    const $ = (id) => document.getElementById(id);
+
+    function parseCSV(text) {
+      // Handles quoted fields, commas inside quotes and escaped quotes.
+      const rows = [];
+      let row = [];
+      let field = "";
+      let quoted = false;
+
+      text = text.replace(/^\uFEFF/, "");
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+
+        if (quoted) {
+          if (char === '"' && text[i + 1] === '"') {
+            field += '"';
+            i++;
+          } else if (char === '"') {
+            quoted = false;
+          } else {
+            field += char;
+          }
+        } else if (char === '"' && field.length === 0) {
+          quoted = true;
+        } else if (char === ",") {
+          row.push(field.trim());
+          field = "";
+        } else if (char === "\n") {
+          row.push(field.trim());
+          if (row.some(value => value !== "")) rows.push(row);
+          row = [];
+          field = "";
+        } else if (char !== "\r") {
+          field += char;
+        }
+      }
+
+      row.push(field.trim());
+      if (row.some(value => value !== "")) rows.push(row);
+
+      if (rows.length < 2) {
+        throw new Error("The CSV is empty or has no data rows.");
+      }
+
+      const headers = rows[0].map(h => h.trim().toLowerCase());
+      const required = ["symbol", "open", "high", "low", "close", "volume"];
+      const missing = required.filter(h => !headers.includes(h));
+
+      if (missing.length) {
+        throw new Error("Missing CSV columns: " + missing.join(", "));
+      }
+
+      const col = Object.fromEntries(
+        headers.map((header, index) => [header, index])
+      );
+
+      return rows.slice(1).map((cells, index) => {
+        const value = (name) => cells[col[name]] ?? "";
+        const symbol = value("symbol").trim();
+
+        if (!symbol) return null;
+
+        const parseNumber = (raw, label) => {
+          const cleaned = String(raw).replace(/,/g, "").trim();
+          const n = Number(cleaned);
+
+          if (cleaned === "" || !Number.isFinite(n)) {
+            throw new Error(
+              `Invalid ${label} value for ${symbol} on CSV row ${index + 2}.`
+            );
+          }
+          return n;
+        };
+
+        const open = parseNumber(value("open"), "Open");
+        const high = parseNumber(value("high"), "High");
+        const low = parseNumber(value("low"), "Low");
+        const close = parseNumber(value("close"), "Close");
+        const volume = parseNumber(value("volume"), "Volume");
+
+        return {
+          symbol,
+          open,
+          high,
+          low,
+          close,
+          volume,
+          change: open === 0 ? null : ((close - open) / open) * 100
+        };
+      }).filter(Boolean);
+    }
+
+    function isIndex(row) {
+      const symbol = row.symbol.trim().toUpperCase();
+      return symbol === "NIFTY 50" ||
+             symbol === "NIFTY50" ||
+             symbol === "NIFTY_50";
+    }
+
+    function formatNumber(value, decimals = 2) {
+      return new Intl.NumberFormat("en-IN", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }).format(value);
+    }
+
+    function formatVolume(value) {
+      return new Intl.NumberFormat("en-IN", {
+        notation: "compact",
+        maximumFractionDigits: 2
+      }).format(value);
+    }
+
+    function formatChange(change) {
+      if (change === null || !Number.isFinite(change)) return "—";
+      return (change > 0 ? "+" : "") + change.toFixed(2) + "%";
+    }
+
+    function changeClass(change) {
+      if (change === null || Math.abs(change) < 0.000001) return "neutral";
+      return change > 0 ? "positive" : "negative";
+    }
+
+    function tileClass(change) {
+      if (change === null || Math.abs(change) < 0.000001) return "flat";
+      return change > 0 ? "up" : "down";
+    }
+
+    function setStatus(message, state = "success") {
+      $("statusText").textContent = message;
+      $("statusDot").className = "dot" +
+        (state === "error" ? " error" :
+         state === "loading" ? " loading" : "");
+    }
+
+    function renderIndex(indexRow) {
+      const container = $("indexCards");
+
+      if (!indexRow) {
+        container.innerHTML =
+          '<div class="card"><div class="message">' +
+          'No NIFTY 50 row found. Add a row with Symbol set to NIFTY 50.' +
+          '</div></div>';
+        return;
+      }
+
+      const change = indexRow.change;
+      const changeText = formatChange(change);
+      const cls = changeClass(change);
+      const arrow = change > 0 ? "▲" : change < 0 ? "▼" : "•";
+
+      container.innerHTML = `
+        <article class="card index-card">
+          <div class="card-top">
+            <span class="index-name">NIFTY 50</span>
+            <span class="tag">INDEX</span>
+          </div>
+          <div class="index-price">${formatNumber(indexRow.close)}</div>
+          <div class="change ${cls}">
+            ${arrow} ${changeText} <span>from open</span>
+          </div>
+          <div class="card-note">
+            Open ${formatNumber(indexRow.open)} ·
+            High ${formatNumber(indexRow.high)} ·
+            Low ${formatNumber(indexRow.low)}
+          </div>
+        </article>
+
+        <article class="card index-card">
+          <div class="card-top">
+            <span class="index-name">Market breadth</span>
+            <span class="tag">STOCKS</span>
+          </div>
+          <div class="index-price">${getStockRows().length}</div>
+          <div class="change neutral">Stocks in your CSV</div>
+          <div class="card-note">Index rows are excluded from the stock count.</div>
+        </article>
+
+        <article class="card index-card">
+          <div class="card-top">
+            <span class="index-name">Index trading range</span>
+            <span class="tag">HIGH / LOW</span>
+          </div>
+          <div class="index-price">${formatNumber(indexRow.high - indexRow.low)}</div>
+          <div class="change neutral">Points between high and low</div>
+          <div class="card-note">
+            Low ${formatNumber(indexRow.low)} ·
+            High ${formatNumber(indexRow.high)}
+          </div>
+        </article>
+      `;
+    }
+
+    function getStockRows() {
+      return allRows.filter(row => !isIndex(row));
+    }
+
+    function getVisibleRows() {
+      const query = $("searchInput").value.trim().toUpperCase();
+      const sort = $("sortSelect").value;
+
+      const rows = getStockRows().filter(row =>
+        row.symbol.toUpperCase().includes(query)
+      );
+
+      rows.sort((a, b) => {
+        switch (sort) {
+          case "change-asc":
+            return (a.change ?? 0) - (b.change ?? 0);
+          case "symbol-asc":
+            return a.symbol.localeCompare(b.symbol);
+          case "volume-desc":
+            return b.volume - a.volume;
+          case "change-desc":
+          default:
+            return (b.change ?? 0) - (a.change ?? 0);
+        }
+      });
+
+      return rows;
+    }
+
+    function renderSummary(rows) {
+      const gainers = rows.filter(row => row.change > 0).length;
+      const losers = rows.filter(row => row.change < 0).length;
+      const unchanged = rows.length - gainers - losers;
+
+      $("summary").innerHTML = `
+        <span>Stocks<strong>${rows.length}</strong></span>
+        <span>Gainers<strong class="positive">${gainers}</strong></span>
+        <span>Losers<strong class="negative">${losers}</strong></span>
+        <span>Unchanged<strong>${unchanged}</strong></span>
+      `;
+    }
+
+    function renderHeatmap(rows) {
+      const heatmap = $("heatmap");
+
+      if (!rows.length) {
+        heatmap.innerHTML =
+          '<div class="message">No stocks match your search.</div>';
+        return;
+      }
+
+      heatmap.innerHTML = rows.map(row => {
+        const cls = tileClass(row.change);
+        const change = formatChange(row.change);
+
+        return `
+          <article class="tile ${cls}"
+            title="${escapeHTML(row.symbol)}: ${change}">
+            <div>
+              <div class="tile-symbol">${escapeHTML(row.symbol)}</div>
+              <div class="tile-price">${formatNumber(row.close)}</div>
+            </div>
+            <div>
+              <div class="tile-change">${change}</div>
+              <div class="tile-volume">Vol. ${formatVolume(row.volume)}</div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderTable(rows) {
+      const body = $("tableBody");
+
+      if (!rows.length) {
+        body.innerHTML =
+          '<tr><td colspan="7" class="neutral">No matching stocks.</td></tr>';
+        return;
+      }
+
+      body.innerHTML = rows.map(row => `
+        <tr>
+          <td class="symbol-cell">${escapeHTML(row.symbol)}</td>
+          <td>${formatNumber(row.open)}</td>
+          <td>${formatNumber(row.high)}</td>
+          <td>${formatNumber(row.low)}</td>
+          <td><strong>${formatNumber(row.close)}</strong></td>
+          <td class="${changeClass(row.change)}">${formatChange(row.change)}</td>
+          <td>${formatVolume(row.volume)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function render() {
+      const visibleRows = getVisibleRows();
+      renderIndex(allRows.find(isIndex));
+      renderSummary(visibleRows);
+      renderHeatmap(visibleRows);
+      renderTable(visibleRows);
+    }
+
+    async function loadCSV() {
+      if (isLoading) return;
+      isLoading = true;
+      setStatus("Loading CSV…", "loading");
+
+      try {
+        const separator = CSV_URL.includes("?") ? "&" : "?";
+        const response = await fetch(
+          CSV_URL + separator + "_=" + Date.now(),
+          { cache: "no-store" }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Could not load ${CSV_URL} (HTTP ${response.status}).`
+          );
+        }
+
+        const text = await response.text();
+        const parsed = parseCSV(text);
+
+        if (!parsed.length) {
+          throw new Error("The CSV contains no usable rows.");
+        }
+
+        allRows = parsed;
+        lastSuccessfulUpdate = new Date();
+
+        render();
+        setStatus("CSV loaded · " + allRows.length + " rows");
+        $("lastUpdated").textContent =
+          "Last fetched: " + lastSuccessfulUpdate.toLocaleString();
+
+      } catch (error) {
+        console.error("CSV loading error:", error);
+        setStatus("CSV loading failed", "error");
+
+        // Keep the last successful data visible if a refresh fails.
+        if (!allRows.length) {
+          $("indexCards").innerHTML =
+            '<div class="card"><div class="message error">' +
+            escapeHTML(error.message) +
+            '<br><br>Check that nifty50.csv is published beside index.html ' +
+            'and uses the required column names.' +
+            '</div></div>';
+
+          $("heatmap").innerHTML =
+            '<div class="message error">' +
+            escapeHTML(error.message) + '</div>';
+
+          $("tableBody").innerHTML =
+            '<tr><td colspan="7" class="neutral">' +
+            'Unable to load market data.</td></tr>';
+        }
+      } finally {
+        isLoading = false;
+      }
+    }
+
+    $("searchInput").addEventListener("input", render);
+    $("sortSelect").addEventListener("change", render);
+    $("refreshButton").addEventListener("click", loadCSV);
+
+    loadCSV();
+    setInterval(loadCSV, REFRESH_INTERVAL);
+  </script>
+</body>
+</html>
+
