@@ -32,12 +32,15 @@ th,td{padding:5px 6px;text-align:left;border-bottom:1px solid var(--ln);white-sp
 th{color:var(--mut);font-weight:600}
 .side{display:flex;flex-direction:column;gap:14px}
 small{color:var(--mut);display:block;text-align:center;padding:0 14px 20px}
+.loc{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px}.loc input,.loc select,.loc button{background:var(--card);color:var(--tx);border:1px solid var(--ln);border-radius:8px;padding:6px 10px;font:inherit;max-width:100%}.loc input{min-width:260px;flex:1;max-width:340px}.loc button{cursor:pointer;color:var(--acc)}#msg{color:#ff6b6b;font-size:12px;text-align:center;min-height:16px}
 </style>
 </head>
 <body>
 <header>
 <h1>Vedic Planet Clock</h1>
-<p>Sidereal (Lahiri) positions · Observer: NSE, Bandra Kurla Complex, Mumbai (19.0607°N, 72.8636°E)</p>
+<p id="loc">Sidereal (Lahiri) positions · Observer: NSE, Mumbai (19.0607°N, 72.8636°E)</p>
+<div class="loc"><input id="ll" placeholder="Paste from Google Maps, e.g. 19.0600, 72.8601" inputmode="decimal" aria-label="Latitude, longitude"><select id="tz" aria-label="Time zone"></select><button id="go">Set location</button><button id="nse">NSE Mumbai</button><button id="gps">My location</button></div>
+<div id="msg"></div>
 </header>
 <main>
 <div class="card"><svg id="wheel" viewBox="0 0 600 600" role="img" aria-label="Live Vedic planetary wheel"></svg></div>
@@ -45,10 +48,11 @@ small{color:var(--mut);display:block;text-align:center;padding:0 14px 20px}
 <div class="card">
 <div class="big" id="ist">--:--:--</div>
 <div class="sub" id="date">—</div>
-<div class="sub" style="margin-top:10px">Vedic clock (since sunrise at NSE)</div>
+<div class="sub" style="margin-top:10px">Vedic clock: 15 day + 15 night muhurtas (local sunrise/sunset)</div>
 <div class="big" id="gh" style="color:var(--acc)">--</div>
-<div class="sub">Ghati : Pala : Vipala</div>
+<div class="sub">Muhurta : Kala : Kashtha</div>
 <div class="bar"><i id="pb"></i></div>
+<div class="kv" id="mu" style="margin-top:10px"></div>
 <div class="grid">
 <div class="kv"><b>Sunrise</b><span id="sr">—</span></div>
 <div class="kv"><b>Sunset</b><span id="ss">—</span></div>
@@ -66,7 +70,7 @@ small{color:var(--mut);display:block;text-align:center;padding:0 14px 20px}
 <small>Computed in your browser with the Swiss Ephemeris (WebAssembly, JPL-based data files hosted with this site). Lahiri ayanamsa, true node Rahu, apparent positions; sunrise and sunset include refraction.</small>
 <script type="module">
 import SwissEph from "./swisseph/src/swisseph.js";
-const LAT=19.0607,LON=72.8636,RAD=Math.PI/180;
+let LAT=19.0607,LON=72.8636,TZ="Asia/Kolkata";const RAD=Math.PI/180;
 const n360=x=>((x%360)+360)%360;
 const SIGN=["Mesha","Vrishabha","Mithuna","Karka","Simha","Kanya","Tula","Vrishchika","Dhanu","Makara","Kumbha","Meena"];
 const GLY=["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
@@ -82,13 +86,19 @@ function positions(ms){const jd=jdOf(ms),out={};
 for(const k in IDS)out[k]=n360(swe.calc_ut(jd,IDS[k],FL)[0]);
 out.Ke=n360(out.Ra+180);
 out.As=n360(swe.houses_ex(jd,swe.SEFLG_SIDEREAL,LAT,LON,"P").ascmc[0]);return out}
-const evt=(ms,flag)=>{const t=swe.rise_trans(jdOf(ms),0,"",swe.SEFLG_SWIEPH,flag,[LON,LAT,0],1013.25,15);return t?msOf(t[0]):null};
+const evt=(ms,flag)=>{const t=swe.rise_trans(jdOf(ms),0,"",swe.SEFLG_SWIEPH,flag,[LON,LAT,0],1013.25,15);if(!t)throw new Error("no sunrise or sunset found");return msOf(t[0])};
 let VD=null;
 function vedicDay(now){if(VD&&now>=VD.rise&&now<VD.nx)return VD;
 let r=evt(now-30*36e5,swe.SE_CALC_RISE);
 for(;;){const nx=evt(r+6e4,swe.SE_CALC_RISE);if(nx>now){VD={rise:r,nx,set:evt(r,swe.SE_CALC_SET)};return VD}r=nx}}
+const MU=[["रुद्र", "अशुभ", "व्रत, संयम", "नए कार्य प्रारम्भ", "Rudra"], ["आहि", "अशुभ", "आंतरिक/दफ्तर कार्य", "क़ानूनी कार्य, आरंभ", "Ahi"], ["मित्र", "शुभ", "मित्रता, समझौते", "झगड़े", "Mitra"], ["पितृ", "अशुभ", "पितृ तर्पण, दान", "विवाह, गृहप्रवेश", "Pitri"], ["वसु", "शुभ", "धन लेन-देन, ख़रीद", "अपव्यय", "Vasu"], ["वाराह", "शुभ", "मरम्मत, निर्माण", "मुकदमेबाजी", "Varaha"], ["विश्वेदेव", "शुभ", "दान, सेवा, टीम कार्य", "स्वार्थी कार्य", "Vishvedeva"], ["विदि", "शुभ (सोम/शुक्र को अशुभ)", "पढ़ाई, अनुबंध", "(सोम/शुक्र): समारोह, आरंभ", "Vidi"], ["सुतमुखी", "शुभ", "यात्रा, नेटवर्किंग", "अधिक वाद", "Sutamukhi"], ["पुरुहूत", "अशुभ", "निजी उपासना", "बड़े उपक्रम", "Puruhuta"], ["वाहिनी", "अशुभ", "योजना, तैयारी", "यात्रा आरंभ", "Vahini"], ["नक्तनकरा", "अशुभ", "विश्राम, रख-रखाव", "सार्वजनिक आयोजन", "Naktanakara"], ["वरुण", "शुभ", "शुद्धिकरण, जल कार्य", "चुगली", "Varuna"], ["अर्यमन्", "शुभ (रविवार को अशुभ)", "समझौते, संबंध", "(रवि): प्रतिष्ठा कार्य", "Aryaman"], ["भग", "अशुभ", "दान", "संपत्ति बाँटना", "Bhaga"], ["गिरीश", "शुभ", "कार्य का समापन", "जोखिम भरे आरंभ", "Girisha"], ["अजपाद", "अशुभ", "परीक्षण, लेखा-जोखा", "यात्रा, शल्यक्रिया", "Ajapada"], ["अहिर्बुध्न्य", "शुभ", "अध्ययन, चिकित्सा", "सतही प्रचार", "Ahirbudhnya"], ["पुष्य", "शुभ", "शिक्षा, पोषण", "गलत भोजन", "Pushya"], ["अश्विनी", "शुभ", "उपचार, यात्रा, शुरुआत", "विलम्ब", "Ashvini"], ["यम", "अशुभ", "अनुशासन, नियम", "उत्सव, जोखिम", "Yama"], ["अग्नि", "शुभ", "साहसिक कार्य, ऊर्जा", "क्रोध, जल्दबाजी", "Agni"], ["विधातृ", "शुभ", "दस्तावेज़, अनुबंध", "टालना", "Vidhatri"], ["कण्ड", "शुभ", "कला, सजावट", "अहंकार", "Kanda"], ["अदिति", "शुभ", "क्षमा, दान", "कठोरता", "Aditi"], ["जीव/अमृत", "अति शुभ", "व्रत, साधना, स्वास्थ्य", "हानिकारक कार्य", "Jiva/Amrita"], ["विष्णु", "शुभ", "दीर्घकालीन योजना", "जुआ", "Vishnu"], ["द्युमद्द्युति", "शुभ", "कला, संगीत", "झगड़े", "Dyumadgadyuti"], ["ब्रह्म", "अति शुभ", "ध्यान, वेदाध्ययन", "व्यर्थ बातें", "Brahma"], ["समुद्र", "शुभ", "यात्रा आरंभ, शुद्धि", "गंदगी, अपव्यय", "Samudra"]];
 const f2=n=>String(n).padStart(2,"0"),$=id=>document.getElementById(id);
-const ist=ms=>{const d=new Date(ms+19800000);return f2(d.getUTCHours())+":"+f2(d.getUTCMinutes())+":"+f2(d.getUTCSeconds())};
+let FM,FW,FD;const mk=()=>{FM=new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hourCycle:"h23",hour:"2-digit",minute:"2-digit",second:"2-digit"});
+FW=new Intl.DateTimeFormat("en-US",{timeZone:TZ,weekday:"short"});FD=new Intl.DateTimeFormat("en-GB",{timeZone:TZ,weekday:"short",day:"numeric",month:"short",year:"numeric"})};
+const ist=ms=>FM.format(ms),wdOf=ms=>["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(FW.format(ms));
+const NSE=[19.0607,72.8636,"NSE, Mumbai"],BTZ=Intl.DateTimeFormat().resolvedOptions().timeZone,sel=$("tz");let LN=NSE[2],tzTouched=false;
+for(const z of new Set(["Asia/Kolkata",...(Intl.supportedValuesOf?Intl.supportedValuesOf("timeZone"):["UTC"])]))sel.add(new Option(z,z));
+sel.value=TZ;mk();
 const dms=l=>{const s=l%30;return Math.floor(s)+"° "+f2(Math.floor((s%1)*60))+"′"};
 const sg=l=>SIGN[Math.floor(l/30)],nk=l=>{const i=Math.floor(l/(40/3));return NAK[i]+" "+(Math.floor((l%(40/3))/(10/3))+1)};
 const NS="http://www.w3.org/2000/svg",W=$("wheel"),C=300;
@@ -114,22 +124,39 @@ for(const[k,,,r]of P){const g=G[k],xy=pol(p[k],r);g.children[0].setAttribute("x2
 g.children[1].setAttribute("cx",xy[0]);g.children[1].setAttribute("cy",xy[1]);g.children[2].setAttribute("x",xy[0]);g.children[2].setAttribute("y",xy[1]);
 g.children[2].setAttribute("text-anchor",xy[0]<C?"end":"start");g.children[2].setAttribute("dx",xy[0]<C?-12:12)}
 const a1=pol(p.As,288),a2=pol(p.As,300);asc.setAttribute("x2",a1[0]);asc.setAttribute("y2",a1[1]);ascT.setAttribute("x",a2[0]);ascT.setAttribute("y",a2[1]+4);
-$("ist").textContent=ist(now)+" IST";
-const di=new Date(now+19800000);$("date").textContent=di.toUTCString().slice(0,16)+" · NSE Mumbai";
+$("ist").textContent=ist(now);
+$("date").textContent=FD.format(now)+" · "+LN+" · "+TZ;
 const s=vedicDay(now),nx={rise:s.nx};
-const el_=(now-s.rise)/6e4/24;
-const g=Math.floor(el_),pa=Math.floor((el_%1)*60),vp=Math.floor((((el_%1)*60)%1)*60);
-$("gh").textContent=f2(g)+" : "+f2(pa)+" : "+f2(vp);$("pb").style.width=Math.min(100,el_/60*100)+"%";
+const isDay=now<s.set,len=isDay?(s.set-s.rise)/15:(s.nx-s.set)/15,base=isDay?s.rise:s.set; // 15 day + 15 night muhurtas
+const idx=Math.min(14,Math.floor((now-base)/len)),mi=(isDay?0:15)+idx,fr=(now-base)/len-idx;
+const ka=Math.min(29,Math.floor(fr*30)),ks=Math.min(29,Math.floor(((fr*30)%1)*30));
+$("gh").textContent=f2(mi+1)+" : "+f2(ka)+" : "+f2(ks);$("pb").style.width=Math.min(100,(now-base)/(isDay?s.set-s.rise:s.nx-s.set)*100)+"%";
 $("sr").textContent=ist(s.rise);$("ss").textContent=ist(s.set);
-const wd=new Date(s.rise+19800000).getUTCDay();$("vara").textContent=VARA[wd];
+const wd=wdOf(s.rise);$("vara").textContent=VARA[wd];
 let hi;if(now<s.set)hi=Math.floor((now-s.rise)/((s.set-s.rise)/12));else hi=12+Math.min(11,Math.floor((now-s.set)/((nx.rise-s.set)/12)));
 $("hora").textContent=HORA[(HORA.indexOf(VL[wd])+hi)%7]+" (#"+(hi+1)+")";
+{const M=MU[mi],L=Math.round(len/1000);let q=M[1];if(mi==7&&(wd==1||wd==5))q="अशुभ";if(mi==13&&wd==0)q="अशुभ";
+$("mu").innerHTML=`<b>${isDay?"Day":"Night"} muhurta ${mi+1} of 30 · length ${Math.floor(L/60)} min ${f2(L%60)} s</b><span style="font-size:19px">${M[0]} (${M[4]})</span> · <span style="color:${q.includes("अशुभ")&&!q.startsWith("शुभ (")||q=="अशुभ"?"#ff6b6b":"var(--grn)"}">${q}</span><br>करें: ${M[2]}<br>न करें: ${M[3]}`}
 const el2=n360(p.Mo-p.Su),ti=Math.floor(el2/12);
 $("tithi").textContent=(ti<15?"Shukla ":"Krishna ")+(ti==29?"Amavasya":ti==14?"Purnima":TITHI[ti%15]);
 $("nak").textContent=nk(p.Mo)+" · "+sg(p.Mo);
 $("yoga").textContent=YOGA[Math.floor(n360(p.Su+p.Mo)/(40/3))];
 $("lagna").textContent=sg(p.As)+" "+dms(p.As);
 $("tb").innerHTML=[...P.map(x=>[x[1],p[x[0]]]),["Lagna",p.As]].map(([n,l])=>`<tr><td>${n}</td><td>${sg(l)}</td><td>${dms(l)}</td><td>${nk(l)}</td></tr>`).join("")}
+function applyLoc(lat,lon,tz,name){LAT=lat;LON=lon;TZ=tz;LN=name;VD=null;if(typeof Astronomy!=="undefined")OBS=new Astronomy.Observer(LAT,LON,0);
+if(![...sel.options].some(o=>o.value==tz))sel.add(new Option(tz,tz));sel.value=tz;mk();
+$("loc").textContent="Sidereal (Lahiri) positions · Observer: "+name+" ("+Math.abs(lat).toFixed(4)+"°"+(lat<0?"S":"N")+", "+Math.abs(lon).toFixed(4)+"°"+(lon<0?"W":"E")+")";
+try{localStorage.setItem("vpc",JSON.stringify([lat,lon,tz,name]))}catch(e){}tick()}
+function fromInput(){const m=$("ll").value.match(/(-?\d+(?:\.\d+)?)\s*[,;\s]\s*(-?\d+(?:\.\d+)?)/),msg=$("msg");
+if(!m){msg.textContent="Paste coordinates like 19.0600, 72.8601 (latitude, longitude).";return}
+const la=+m[1],lo=+m[2];if(Math.abs(la)>60||Math.abs(lo)>180){msg.textContent="Latitude must be within ±60° and longitude within ±180°.";return}
+msg.textContent="";const india=la>6&&la<37&&lo>68&&lo<98;
+try{applyLoc(la,lo,india?"Asia/Kolkata":(tzTouched?sel.value:BTZ),"Custom location")}catch(e){msg.textContent="Could not compute sunrise here: "+e.message}}
+$("go").onclick=fromInput;$("ll").onkeydown=e=>{if(e.key=="Enter")fromInput()};
+$("nse").onclick=()=>{$("msg").textContent="";applyLoc(...NSE)};
+sel.onchange=()=>{tzTouched=true;applyLoc(LAT,LON,sel.value,LN)};
+$("gps").onclick=()=>navigator.geolocation?navigator.geolocation.getCurrentPosition(p=>applyLoc(p.coords.latitude,p.coords.longitude,BTZ,"My location"),()=>{$("msg").textContent="Location permission denied or unavailable."}):0;
+try{const v=JSON.parse(localStorage.getItem("vpc"));if(v&&v.length==4)applyLoc(v[0],v[1],v[2],v[3])}catch(e){}
 tick();setInterval(tick,1000);
 </script>
 </body>
