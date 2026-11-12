@@ -38,7 +38,7 @@ small{color:var(--mut);display:block;text-align:center;padding:0 14px 20px}
 <body>
 <header>
 <h1>Vedic Planet Clock</h1>
-<p id="loc">Sidereal (Lahiri) positions · Observer: NSE, Mumbai (19.0607°N, 72.8636°E)</p>
+<p id="loc">Sidereal (Lahiri) positions · Observer: NSE, Mumbai (19.0600°N, 72.8601°E)</p>
 <div class="loc"><input id="ll" placeholder="Paste from Google Maps, e.g. 19.0600, 72.8601" inputmode="decimal" aria-label="Latitude, longitude"><select id="tz" aria-label="Time zone"></select><button id="go">Set location</button><button id="nse">NSE Mumbai</button><button id="gps">My location</button></div>
 <div id="msg"></div>
 </header>
@@ -59,9 +59,11 @@ small{color:var(--mut);display:block;text-align:center;padding:0 14px 20px}
 <div class="kv"><b>Vara</b><span id="vara">—</span></div>
 <div class="kv"><b>Hora lord</b><span id="hora">—</span></div>
 <div class="kv"><b>Tithi</b><span id="tithi">—</span></div>
+<div class="kv"><b>Karana</b><span id="kar">—</span></div>
 <div class="kv"><b>Nakshatra</b><span id="nak">—</span></div>
 <div class="kv"><b>Yoga</b><span id="yoga">—</span></div>
-<div class="kv"><b>Lagna (Asc)</b><span id="lagna">—</span></div>
+<div class="kv" style="grid-column:1/-1"><b>Lagna (Asc)</b><span id="lagna">—</span></div>
+<div class="kv" style="grid-column:1/-1"><b>Hindu month (Masa)</b><span id="masa">—</span></div>
 </div>
 </div>
 <div class="card tw"><table><thead><tr><th>Graha</th><th>Rashi</th><th>Degree</th><th>Nakshatra</th></tr></thead><tbody id="tb"></tbody></table></div>
@@ -70,7 +72,7 @@ small{color:var(--mut);display:block;text-align:center;padding:0 14px 20px}
 <small>Computed in your browser with the Swiss Ephemeris (WebAssembly, JPL-based data files hosted with this site). Lahiri ayanamsa, true node Rahu, apparent positions; sunrise and sunset include refraction.</small>
 <script type="module">
 import SwissEph from "./swisseph/src/swisseph.js";
-let LAT=19.0607,LON=72.8636,TZ="Asia/Kolkata";const RAD=Math.PI/180;
+let LAT=19.060035748878455,LON=72.86011985884626,TZ="Asia/Kolkata";const RAD=Math.PI/180;
 const n360=x=>((x%360)+360)%360;
 const SIGN=["Mesha","Vrishabha","Mithuna","Karka","Simha","Kanya","Tula","Vrishchika","Dhanu","Makara","Kumbha","Meena"];
 const GLY=["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
@@ -92,11 +94,20 @@ function vedicDay(now){if(VD&&now>=VD.rise&&now<VD.nx)return VD;
 let r=evt(now-30*36e5,swe.SE_CALC_RISE);
 for(;;){const nx=evt(r+6e4,swe.SE_CALC_RISE);if(nx>now){VD={rise:r,nx,set:evt(r,swe.SE_CALC_SET)};return VD}r=nx}}
 const MU=[["रुद्र", "अशुभ", "व्रत, संयम", "नए कार्य प्रारम्भ", "Rudra"], ["आहि", "अशुभ", "आंतरिक/दफ्तर कार्य", "क़ानूनी कार्य, आरंभ", "Ahi"], ["मित्र", "शुभ", "मित्रता, समझौते", "झगड़े", "Mitra"], ["पितृ", "अशुभ", "पितृ तर्पण, दान", "विवाह, गृहप्रवेश", "Pitri"], ["वसु", "शुभ", "धन लेन-देन, ख़रीद", "अपव्यय", "Vasu"], ["वाराह", "शुभ", "मरम्मत, निर्माण", "मुकदमेबाजी", "Varaha"], ["विश्वेदेव", "शुभ", "दान, सेवा, टीम कार्य", "स्वार्थी कार्य", "Vishvedeva"], ["विदि", "शुभ (सोम/शुक्र को अशुभ)", "पढ़ाई, अनुबंध", "(सोम/शुक्र): समारोह, आरंभ", "Vidi"], ["सुतमुखी", "शुभ", "यात्रा, नेटवर्किंग", "अधिक वाद", "Sutamukhi"], ["पुरुहूत", "अशुभ", "निजी उपासना", "बड़े उपक्रम", "Puruhuta"], ["वाहिनी", "अशुभ", "योजना, तैयारी", "यात्रा आरंभ", "Vahini"], ["नक्तनकरा", "अशुभ", "विश्राम, रख-रखाव", "सार्वजनिक आयोजन", "Naktanakara"], ["वरुण", "शुभ", "शुद्धिकरण, जल कार्य", "चुगली", "Varuna"], ["अर्यमन्", "शुभ (रविवार को अशुभ)", "समझौते, संबंध", "(रवि): प्रतिष्ठा कार्य", "Aryaman"], ["भग", "अशुभ", "दान", "संपत्ति बाँटना", "Bhaga"], ["गिरीश", "शुभ", "कार्य का समापन", "जोखिम भरे आरंभ", "Girisha"], ["अजपाद", "अशुभ", "परीक्षण, लेखा-जोखा", "यात्रा, शल्यक्रिया", "Ajapada"], ["अहिर्बुध्न्य", "शुभ", "अध्ययन, चिकित्सा", "सतही प्रचार", "Ahirbudhnya"], ["पुष्य", "शुभ", "शिक्षा, पोषण", "गलत भोजन", "Pushya"], ["अश्विनी", "शुभ", "उपचार, यात्रा, शुरुआत", "विलम्ब", "Ashvini"], ["यम", "अशुभ", "अनुशासन, नियम", "उत्सव, जोखिम", "Yama"], ["अग्नि", "शुभ", "साहसिक कार्य, ऊर्जा", "क्रोध, जल्दबाजी", "Agni"], ["विधातृ", "शुभ", "दस्तावेज़, अनुबंध", "टालना", "Vidhatri"], ["कण्ड", "शुभ", "कला, सजावट", "अहंकार", "Kanda"], ["अदिति", "शुभ", "क्षमा, दान", "कठोरता", "Aditi"], ["जीव/अमृत", "अति शुभ", "व्रत, साधना, स्वास्थ्य", "हानिकारक कार्य", "Jiva/Amrita"], ["विष्णु", "शुभ", "दीर्घकालीन योजना", "जुआ", "Vishnu"], ["द्युमद्द्युति", "शुभ", "कला, संगीत", "झगड़े", "Dyumadgadyuti"], ["ब्रह्म", "अति शुभ", "ध्यान, वेदाध्ययन", "व्यर्थ बातें", "Brahma"], ["समुद्र", "शुभ", "यात्रा आरंभ, शुद्धि", "गंदगी, अपव्यय", "Samudra"]];
+const MASA=[["Chaitra","चैत्र"],["Vaishakha","वैशाख"],["Jyeshtha","ज्येष्ठ"],["Ashadha","आषाढ"],["Shravana","श्रावण"],["Bhadrapada","भाद्रपद"],["Ashvina","आश्विन"],["Kartika","कार्तिक"],["Margashirsha","मार्गशीर्ष"],["Pausha","पौष"],["Magha","माघ"],["Phalguna","फाल्गुन"]];
+const KAR=[["Bava","बव"],["Balava","बालव"],["Kaulava","कौलव"],["Taitila","तैतिल"],["Gara","गर"],["Vanija","वणिज"],["Vishti (Bhadra)","विष्टि (भद्रा)"]],KFIX=[["Shakuni","शकुनि"],["Chatushpada","चतुष्पाद"],["Naga","नाग"]];
+const elong=t=>{const p=positions(t);return n360(p.Mo-p.Su)};
+const nmNear=t=>{for(let i=0;i<8;i++){let e=elong(t);if(e>180)e-=360;t-=e/12.1908*864e5}return t};
+let MC=null;
+function masaInfo(now){if(MC&&now>=MC.a&&now<MC.b)return MC;
+const a=nmNear(now-elong(now)/12.1908*864e5),b=nmNear(a+29.53*864e5);
+const sa=Math.floor(positions(a+6e4).Su/30),sb=Math.floor(positions(b+6e4).Su/30);
+return MC={a,b,idx:(sa+1)%12,adhika:sa==sb}}
 const f2=n=>String(n).padStart(2,"0"),$=id=>document.getElementById(id);
 let FM,FW,FD;const mk=()=>{FM=new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hourCycle:"h23",hour:"2-digit",minute:"2-digit",second:"2-digit"});
 FW=new Intl.DateTimeFormat("en-US",{timeZone:TZ,weekday:"short"});FD=new Intl.DateTimeFormat("en-GB",{timeZone:TZ,weekday:"short",day:"numeric",month:"short",year:"numeric"})};
 const ist=ms=>FM.format(ms),wdOf=ms=>["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(FW.format(ms));
-const NSE=[19.0607,72.8636,"NSE, Mumbai"],BTZ=Intl.DateTimeFormat().resolvedOptions().timeZone,sel=$("tz");let LN=NSE[2],tzTouched=false;
+const NSE=[19.060035748878455,72.86011985884626,"Asia/Kolkata","NSE, Mumbai"],BTZ=Intl.DateTimeFormat().resolvedOptions().timeZone,sel=$("tz");let LN=NSE[3],tzTouched=false;
 for(const z of new Set(["Asia/Kolkata",...(Intl.supportedValuesOf?Intl.supportedValuesOf("timeZone"):["UTC"])]))sel.add(new Option(z,z));
 sel.value=TZ;mk();
 const dms=l=>{const s=l%30;return Math.floor(s)+"° "+f2(Math.floor((s%1)*60))+"′"};
@@ -142,11 +153,15 @@ $("tithi").textContent=(ti<15?"Shukla ":"Krishna ")+(ti==29?"Amavasya":ti==14?"P
 $("nak").textContent=nk(p.Mo)+" · "+sg(p.Mo);
 $("yoga").textContent=YOGA[Math.floor(n360(p.Su+p.Mo)/(40/3))];
 $("lagna").textContent=sg(p.As)+" "+dms(p.As);
+{const mc=masaInfo(now),kr=el2>=180,ad=mc.adhika,nm=MASA[mc.idx],pm=MASA[(kr&&!ad?mc.idx+1:mc.idx)%12],kn=Math.floor(el2/6),
+kk=kn==0?["Kimstughna","किंस्तुघ्न"]:kn<57?KAR[(kn-1)%7]:KFIX[kn-57];
+$("masa").textContent=(ad?"Adhika ":"")+nm[0]+" ("+nm[1]+") · Amanta  |  Purnimanta: "+pm[0]+" ("+pm[1]+")";
+$("kar").textContent=kk[0]+" ("+kk[1]+")"}
 $("tb").innerHTML=[...P.map(x=>[x[1],p[x[0]]]),["Lagna",p.As]].map(([n,l])=>`<tr><td>${n}</td><td>${sg(l)}</td><td>${dms(l)}</td><td>${nk(l)}</td></tr>`).join("")}
-function applyLoc(lat,lon,tz,name){LAT=lat;LON=lon;TZ=tz;LN=name;VD=null;if(typeof Astronomy!=="undefined")OBS=new Astronomy.Observer(LAT,LON,0);
+function applyLoc(lat,lon,tz,name){try{new Intl.DateTimeFormat("en",{timeZone:tz})}catch(e){tz="Asia/Kolkata"}LAT=lat;LON=lon;TZ=tz;LN=name;VD=null;if(typeof Astronomy!=="undefined")OBS=new Astronomy.Observer(LAT,LON,0);
 if(![...sel.options].some(o=>o.value==tz))sel.add(new Option(tz,tz));sel.value=tz;mk();
 $("loc").textContent="Sidereal (Lahiri) positions · Observer: "+name+" ("+Math.abs(lat).toFixed(4)+"°"+(lat<0?"S":"N")+", "+Math.abs(lon).toFixed(4)+"°"+(lon<0?"W":"E")+")";
-try{localStorage.setItem("vpc",JSON.stringify([lat,lon,tz,name]))}catch(e){}tick()}
+try{localStorage.setItem("vpc2",JSON.stringify([lat,lon,tz,name]))}catch(e){}tick()}
 function fromInput(){const m=$("ll").value.match(/(-?\d+(?:\.\d+)?)\s*[,;\s]\s*(-?\d+(?:\.\d+)?)/),msg=$("msg");
 if(!m){msg.textContent="Paste coordinates like 19.0600, 72.8601 (latitude, longitude).";return}
 const la=+m[1],lo=+m[2];if(Math.abs(la)>60||Math.abs(lo)>180){msg.textContent="Latitude must be within ±60° and longitude within ±180°.";return}
@@ -156,7 +171,7 @@ $("go").onclick=fromInput;$("ll").onkeydown=e=>{if(e.key=="Enter")fromInput()};
 $("nse").onclick=()=>{$("msg").textContent="";applyLoc(...NSE)};
 sel.onchange=()=>{tzTouched=true;applyLoc(LAT,LON,sel.value,LN)};
 $("gps").onclick=()=>navigator.geolocation?navigator.geolocation.getCurrentPosition(p=>applyLoc(p.coords.latitude,p.coords.longitude,BTZ,"My location"),()=>{$("msg").textContent="Location permission denied or unavailable."}):0;
-try{const v=JSON.parse(localStorage.getItem("vpc"));if(v&&v.length==4)applyLoc(v[0],v[1],v[2],v[3])}catch(e){}
+try{const v=JSON.parse(localStorage.getItem("vpc2"));if(v&&v.length==4)v[3]=="NSE, Mumbai"?applyLoc(...NSE):applyLoc(v[0],v[1],v[2],v[3])}catch(e){}
 tick();setInterval(tick,1000);
 </script>
 </body>
