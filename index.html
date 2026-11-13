@@ -69,6 +69,7 @@ small{color:var(--mut);display:block;text-align:center;padding:0 14px 20px}
 </div>
 <div class="card tw"><table><thead><tr><th>Graha</th><th>Rashi</th><th>Degree</th><th>Nakshatra</th></tr></thead><tbody id="tb"></tbody></table></div>
 </div>
+<div class="card" style="grid-column:1/-1"><b>Panchang details</b><div id="pd" style="margin-top:8px"></div><div id="cg" class="kv" style="margin-top:10px"></div><div class="m" style="margin-top:8px">Rahu, Gulika and Yamaganda divide sunrise–sunset into eight parts; Choghadiya uses eight day and eight night parts; Abhijit is the 8th of the 15 day muhurtas; Brahma Muhurta is 96–48 minutes before sunrise. Varjyam and Amrit Kalam use the traditional per-nakshatra tables. Vikram Samvat is Chaitra-based.</div></div>
 <div class="card tw" style="grid-column:1/-1"><b>Rashi transits (sidereal, Lahiri)</b><table><thead><tr><th>Graha</th><th>Now in</th><th>Last entered</th><th>Next change</th></tr></thead><tbody id="trb"></tbody></table></div>
 <div class="card" style="grid-column:1/-1"><b>Eclipses: last and upcoming</b><div class="eg"><div class="kv" id="es0"></div><div class="kv" id="es1"></div><div class="kv" id="el0"></div><div class="kv" id="el1"></div></div>
 <div class="m" style="margin-top:8px">Eclipse dates, types, Saros, gamma, magnitudes and contacts for 2025–2050 come from Wikipedia’s lists (NASA/Espenak); times are shown in your time zone after converting Terrestrial Time to UTC (−69 s). Regions are included through 2029. Visibility at your location, and any date after 2050, are calculated live with astronomy-engine: <a href="https://en.wikipedia.org/wiki/List_of_solar_eclipses_in_the_21st_century" style="color:var(--acc)">solar</a> · <a href="https://en.wikipedia.org/wiki/List_of_lunar_eclipses_in_the_21st_century" style="color:var(--acc)">lunar</a>.</div></div>
@@ -111,7 +112,7 @@ const a=nmNear(now-elong(now)/12.1908*864e5),b=nmNear(a+29.53*864e5);
 const sa=Math.floor(positions(a+6e4).Su/30),sb=Math.floor(positions(b+6e4).Su/30);
 return MC={a,b,idx:(sa+1)%12,adhika:sa==sb}}
 const TRP=[["Ma","Mars"],["Ra","Rahu"],["Ju","Jupiter"],["Sa","Saturn"],["Ur","Uranus"],["Ne","Neptune"],["Pl","Pluto"]],
-TS={Ma:1,Ju:3,Sa:5,Ra:3,Ur:10,Ne:15,Pl:15},TSP={Ma:760,Ju:800,Sa:1500,Ra:1200,Ur:4000,Ne:7500,Pl:15000};
+TS={Su:2,Ma:1,Ju:3,Sa:5,Ra:3,Ur:10,Ne:15,Pl:15},TSP={Su:45,Ma:760,Ju:800,Sa:1500,Ra:1200,Ur:4000,Ne:7500,Pl:15000};
 const sg1=(k,t)=>Math.floor(lon1(k,t)/30);
 function ingress(k,now,dir){const s0=sg1(k,now),st=TS[k]*864e5*dir;let a=now;
 for(let i=0,n=TSP[k]/TS[k];i<n;i++){const b=a+st,sb=sg1(k,b);if(sb!=s0){let lo=a,hi=b;for(let j=0;j<24;j++){const m=(lo+hi)/2;if(sg1(k,m)==s0)lo=m;else hi=m}return{t:(lo+hi)/2,s:sb}}a=b}return null}
@@ -286,6 +287,36 @@ function eclData(now){const k=LAT+","+LON+","+TZ;if(EC&&EC.k==k&&now<EC.n0&&now<
 const s=pick(SOL,now,compSolar),l=pick(LUN,now,compLunar);
 return EC={k,n0:s[1].t,n1:l[1].t,h:[solarHtml(s[0],"Last"),solarHtml(s[1],"Next"),lunarHtml(l[0],"Last"),lunarHtml(l[1],"Next")]}}
 const eclHtml=now=>eclData(now).h;
+const tt=ms=>ist(ms).slice(0,5);
+const tn=i=>(i<15?"Shukla ":"Krishna ")+(i==29?"Amavasya":i==14?"Purnima":TITHI[i%15]),kname=k=>k==0?"Kimstughna":k<57?KAR[(k-1)%7][0]:KFIX[k-57][0];
+const elg=t=>n360(lon1("Mo",t)-lon1("Su",t));
+const QF={ti:[elg,12,30],ka:[elg,6,60],na:[t=>lon1("Mo",t),40/3,27],yo:[t=>n360(lon1("Su",t)+lon1("Mo",t)),40/3,27]};
+function edge(f,u,now,dir){const ix=t=>Math.floor(f(t)/u+1e-9),k0=ix(now);let a=now;
+for(let i=0;i<90;i++){const b=a+dir*18e5;if(ix(b)!=k0){let lo=a,hi=b;for(let j=0;j<22;j++){const m=(lo+hi)/2;if(ix(m)==k0)lo=m;else hi=m}return(lo+hi)/2}a=b}return null}
+const RK=[8,2,7,5,6,4,3],GK=[7,6,5,4,3,2,1],YG=[5,4,3,2,1,7,6];
+const VARJ=[50,24,30,40,14,11,30,20,32,30,20,18,22,20,14,14,10,14,20,24,20,10,10,18,16,24,30],AMRIT=[42,48,54,52,38,35,54,44,56,54,44,42,46,44,38,38,34,38,44,48,44,34,34,42,40,48,54];
+const RITU=["Vasanta","Grishma","Varsha","Sharad","Hemanta","Shishira"];
+const CGC=["Udveg","Char","Labh","Amrit","Kaal","Shubh","Rog"],CGN=["Shubh","Amrit","Char","Rog","Kaal","Labh","Udveg"],CF=[0,3,6,2,5,1,4],NF=[0,2,4,6,1,3,5],BAD={Udveg:1,Rog:1,Kaal:1};
+let PD=null;
+function pdCalc(now,s,wd,p,k){const e={};for(const id in QF){const[f,u,c]=QF[id],i=Math.floor(f(now)/u);e[id]={i,end:edge(f,u,now,1),n:(i+1)%c}}
+const[nf,nu]=QF.na,st0=edge(nf,nu,now,-1),en0=e.na.end,en1=edge(nf,nu,en0+6e4,1),dp=(s.set-s.rise)/8,seg=i=>tt(s.rise+(i-1)*dp)+"–"+tt(s.rise+i*dp),mu=(s.set-s.rise)/15;
+const vw=[[st0,en0,e.na.i],[en0,en1,e.na.n]],win=T=>vw.map(([a,b,n])=>{const L=b-a,x=a+T[n]/60*L;return[x,x+L/15]}).filter(([x,y])=>y>s.rise&&x<s.nx).map(([x,y])=>fdt(x)+" – "+tt(y)).join("<br>")||"none in this Vedic day";
+const R=(a,b)=>`<div><span class="m">${a}:</span> ${b}</div>`,sec=(t,r)=>`<div class="kv"><b>${t}</b>${r.join("")}</div>`,en=(id,nm)=>e[id].end?`${fdt(e[id].end)} → ${nm(e[id].n)}`:"—";
+const o=new Astronomy.Observer(LAT,LON,0),mr=Astronomy.SearchRiseSet("Moon",o,1,new Date(s.rise),2),ms=Astronomy.SearchRiseSet("Moon",o,-1,new Date(s.rise),2);
+const mc=masaInfo(now),pt=new Intl.DateTimeFormat("en-US",{timeZone:TZ,year:"numeric",month:"numeric"}).formatToParts(now),gy=+pt.find(x=>x.type=="year").value,gm=+pt.find(x=>x.type=="month").value;
+const vs=gy+57-(mc.idx>=9&&gm<=4?1:0),cur=Math.floor(p.Su/30),sk=ingress("Su",now,-1),sn=ingress("Su",now,1);
+const h='<div class="eg">'+sec("Limbs: ends at → next",[R("Tithi",en("ti",tn)),R("Nakshatra",en("na",i=>NAK[i])),R("Yoga",en("yo",i=>YOGA[i])),R("Karana",en("ka",kname))])
++sec("Inauspicious periods",[R("Rahu Kalam",seg(RK[wd])),R("Gulika Kalam",seg(GK[wd])),R("Yamaganda",seg(YG[wd])),R("Varjyam",win(VARJ)),R("Dur Muhurta","not included (traditional tables differ)")])
++sec("Auspicious periods",[R("Abhijit Muhurta",tt(s.rise+7*mu)+"–"+tt(s.rise+8*mu)),R("Brahma Muhurta",tt(s.rise-96*6e4)+"–"+tt(s.rise-48*6e4)),R("Amrit Kalam",win(AMRIT))])
++sec("Moon and Sun",[R("Moonrise",mr?fdt(mr.date.getTime()):"—"),R("Moonset",ms?fdt(ms.date.getTime()):"—"),R("Sun’s nakshatra",nk(p.Su)),R("Ayana",p.Su>=270||p.Su<90?"Uttarayana":"Dakshinayana"),
+R("Last Sankranti",SIGN[cur]+" · "+(sk?fdt(sk.t):"—")),R("Next Sankranti",sn?SIGN[sn.s]+" · "+fdt(sn.t):"—")])
++sec("Calendar",[R("Vikram Samvat",vs),R("Shaka",vs-135),R("Kali Yuga",vs+3044),R("Ritu",RITU[Math.floor(mc.idx/2)])])+"</div>";
+return{k,h,u:Math.min(s.nx,...["ti","ka","na","yo"].map(i=>e[i].end||1e15))}}
+function cgHtml(now,s,wd){const out=[];
+for(const[a,b,cy,f]of[[s.rise,s.set,CGC,CF[wd]],[s.set,s.nx,CGN,NF[wd]]]){const L=(b-a)/8;for(let i=0;i<8;i++){const n=cy[(f+i)%7],x=a+i*L,on=now>=x&&now<x+L;
+out.push(`<span style="display:inline-block;margin:2px;padding:2px 6px;border-radius:6px;border:1px solid var(--ln);${on?"background:var(--acc);":""}color:${on?"var(--bg)":BAD[n]?"#ff6b6b":"var(--grn)"}">${tt(x)} ${n}</span>`)}out.push("<br>")}
+return"<b>Choghadiya</b> <span class=\"m\">(day, then night; red = inauspicious)</span><br>"+out.join("")}
+function pdRender(now,s,wd,p){const k=[LAT,LON,TZ,s.rise].join();if(!PD||PD.k!=k||now>=PD.u)PD=pdCalc(now,s,wd,p,k);setH("pd",PD.h);setH("cg",cgHtml(now,s,wd))}
 const setH=(id,h)=>{const e=$(id);if(e.dataset.h!==h){e.dataset.h=h;e.innerHTML=h}};
 const f2=n=>String(n).padStart(2,"0"),$=id=>document.getElementById(id);
 let FM,FW,FD;const mk=()=>{FM=new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hourCycle:"h23",hour:"2-digit",minute:"2-digit",second:"2-digit"});
@@ -342,6 +373,7 @@ kk=kn==0?["Kimstughna","किंस्तुघ्न"]:kn<57?KAR[(kn-1)%7]:KFI
 $("masa").textContent=(ad?"Adhika ":"")+nm[0]+" ("+nm[1]+") · Amanta  |  Purnimanta: "+pm[0]+" ("+pm[1]+")";
 $("kar").textContent=kk[0]+" ("+kk[1]+")"}
 try{setH("trb",transRows(p));const eh=eclHtml(now);setH("es0",eh[0]);setH("es1",eh[1]);setH("el0",eh[2]);setH("el1",eh[3])}catch(e){}
+try{pdRender(now,s,wd,p)}catch(e){console.error(e)}
 if(!TQ)TQ=setTimeout(stepTransits,0);
 $("tb").innerHTML=[...P.map(x=>[x[1],p[x[0]]]),["Lagna",p.As]].map(([n,l])=>`<tr><td>${n}</td><td>${sg(l)}</td><td>${dms(l)}</td><td>${nk(l)}</td></tr>`).join("")}
 function applyLoc(lat,lon,tz,name){try{new Intl.DateTimeFormat("en",{timeZone:tz})}catch(e){tz="Asia/Kolkata"}LAT=lat;LON=lon;TZ=tz;LN=name;VD=null;if(typeof Astronomy!=="undefined")OBS=new Astronomy.Observer(LAT,LON,0);
