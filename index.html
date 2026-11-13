@@ -33,6 +33,7 @@ th{color:var(--mut);font-weight:600}
 .side{display:flex;flex-direction:column;gap:14px}
 small{color:var(--mut);display:block;text-align:center;padding:0 14px 20px}
 .loc{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px}.loc input,.loc select,.loc button{background:var(--card);color:var(--tx);border:1px solid var(--ln);border-radius:8px;padding:6px 10px;font:inherit;max-width:100%}.loc input{min-width:260px;flex:1;max-width:340px}.loc button{cursor:pointer;color:var(--acc)}#msg{color:#ff6b6b;font-size:12px;text-align:center;min-height:16px}
+.m{color:var(--mut);font-size:12px}.eg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}.eg .kv{font-size:13px;line-height:1.5}@media(max-width:820px){.eg{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -68,10 +69,15 @@ small{color:var(--mut);display:block;text-align:center;padding:0 14px 20px}
 </div>
 <div class="card tw"><table><thead><tr><th>Graha</th><th>Rashi</th><th>Degree</th><th>Nakshatra</th></tr></thead><tbody id="tb"></tbody></table></div>
 </div>
+<div class="card tw" style="grid-column:1/-1"><b>Rashi transits (sidereal, Lahiri)</b><table><thead><tr><th>Graha</th><th>Now in</th><th>Last entered</th><th>Next change</th></tr></thead><tbody id="trb"></tbody></table></div>
+<div class="card" style="grid-column:1/-1"><b>Eclipses: last and upcoming</b><div class="eg"><div class="kv" id="es0"></div><div class="kv" id="es1"></div><div class="kv" id="el0"></div><div class="kv" id="el1"></div></div>
+<div class="m" style="margin-top:8px">Eclipse dates, types, Saros, gamma, magnitudes and contacts for 2025–2050 come from Wikipedia’s lists (NASA/Espenak); times are shown in your time zone after converting Terrestrial Time to UTC (−69 s). Regions are included through 2029. Visibility at your location, and any date after 2050, are calculated live with astronomy-engine: <a href="https://en.wikipedia.org/wiki/List_of_solar_eclipses_in_the_21st_century" style="color:var(--acc)">solar</a> · <a href="https://en.wikipedia.org/wiki/List_of_lunar_eclipses_in_the_21st_century" style="color:var(--acc)">lunar</a>.</div></div>
 </main>
 <small>Computed in your browser with the Swiss Ephemeris (WebAssembly, JPL-based data files hosted with this site). Lahiri ayanamsa, true node Rahu, apparent positions; sunrise and sunset include refraction.</small>
+<script src="./astronomy.browser.min.js"></script>
 <script type="module">
 import SwissEph from "./swisseph/src/swisseph.js";
+let OBS=null;
 let LAT=19.060035748878455,LON=72.86011985884626,TZ="Asia/Kolkata";const RAD=Math.PI/180;
 const n360=x=>((x%360)+360)%360;
 const SIGN=["Mesha","Vrishabha","Mithuna","Karka","Simha","Kanya","Tula","Vrishchika","Dhanu","Makara","Kumbha","Meena"];
@@ -89,6 +95,7 @@ for(const k in IDS)out[k]=n360(swe.calc_ut(jd,IDS[k],FL)[0]);
 out.Ke=n360(out.Ra+180);
 out.As=n360(swe.houses_ex(jd,swe.SEFLG_SIDEREAL,LAT,LON,"P").ascmc[0]);return out}
 const evt=(ms,flag)=>{const t=swe.rise_trans(jdOf(ms),0,"",swe.SEFLG_SWIEPH,flag,[LON,LAT,0],1013.25,15);if(!t)throw new Error("no sunrise or sunset found");return msOf(t[0])};
+const lon1=(k,ms)=>n360(swe.calc_ut(jdOf(ms),IDS[k],FL)[0]);
 let VD=null;
 function vedicDay(now){if(VD&&now>=VD.rise&&now<VD.nx)return VD;
 let r=evt(now-30*36e5,swe.SE_CALC_RISE);
@@ -103,6 +110,183 @@ function masaInfo(now){if(MC&&now>=MC.a&&now<MC.b)return MC;
 const a=nmNear(now-elong(now)/12.1908*864e5),b=nmNear(a+29.53*864e5);
 const sa=Math.floor(positions(a+6e4).Su/30),sb=Math.floor(positions(b+6e4).Su/30);
 return MC={a,b,idx:(sa+1)%12,adhika:sa==sb}}
+const TRP=[["Ma","Mars"],["Ra","Rahu"],["Ju","Jupiter"],["Sa","Saturn"],["Ur","Uranus"],["Ne","Neptune"],["Pl","Pluto"]],
+TS={Ma:1,Ju:3,Sa:5,Ra:3,Ur:10,Ne:15,Pl:15},TSP={Ma:760,Ju:800,Sa:1500,Ra:1200,Ur:4000,Ne:7500,Pl:15000};
+const sg1=(k,t)=>Math.floor(lon1(k,t)/30);
+function ingress(k,now,dir){const s0=sg1(k,now),st=TS[k]*864e5*dir;let a=now;
+for(let i=0,n=TSP[k]/TS[k];i<n;i++){const b=a+st,sb=sg1(k,b);if(sb!=s0){let lo=a,hi=b;for(let j=0;j<24;j++){const m=(lo+hi)/2;if(sg1(k,m)==s0)lo=m;else hi=m}return{t:(lo+hi)/2,s:sb}}a=b}return null}
+let TC={},TQ=null;
+function stepTransits(){const now=Date.now(),k=TRP.map(x=>x[0]).find(k=>!TC[k]||(TC[k].next&&now>=TC[k].next.t));
+if(!k){TQ=null;return}
+try{TC[k]={last:ingress(k,now,-1),next:ingress(k,now,1)}}catch(e){TC[k]={last:null,next:null}}
+TQ=setTimeout(stepTransits,15)}
+let FTz="",FTf;const fdt=ms=>{if(FTz!=TZ){FTz=TZ;FTf=new Intl.DateTimeFormat("en-GB",{timeZone:TZ,day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hourCycle:"h23"})}return FTf.format(ms)};
+const transRows=p=>TRP.map(([k,n])=>{const c=TC[k],cur=Math.floor(p[k]/30);
+if(!c)return`<tr><td>${n}</td><td>${SIGN[cur]}</td><td colspan="2" class="m">calculating…</td></tr>`;
+const L=c.last?`${fdt(c.last.t)} <span class="m">(from ${SIGN[c.last.s]})</span>`:"before searched range",
+N=c.next?`${fdt(c.next.t)} → <b>${SIGN[c.next.s]}</b>${c.next.s==(cur+11)%12?" (retro)":""}`:"beyond searched range";
+return`<tr><td>${n}</td><td>${SIGN[cur]}</td><td>${L}</td><td>${N}</td></tr>`}).join("");
+const WS={"2025-09-21":[154,-1.0651,.855,"Partial: Oceania, New Zealand, Antarctica"],
+"2026-02-17":[121,-.9743,.963,"Annular: Antarctica. Partial: Southern Argentina and Chile, Southern Africa, Antarctica"],
+"2026-08-12":[126,.8977,1.0386,"Total: Greenland, Iceland, Spain, Northeastern Portugal. Partial: Northern North America, Europe, West Africa"],
+"2027-02-06":[131,-.2952,.9281,"Annular: Chile, Argentina, Atlantic. Partial: South America, Antarctica, West and South Africa"],
+"2027-08-02":[136,.1421,1.079,"Total: Morocco, Spain, Algeria, Tunisia, Libya, Egypt, Saudi Arabia, Yemen, Somalia. Partial: Africa, Europe, Middle East, South Asia, Southeast Asia"],
+"2028-01-26":[141,.3901,.9208,"Annular: Ecuador, Peru, Colombia, Brazil, French Guiana, Portugal, Spain. Partial: Central and Northern South America, Central America, Caribbean, Eastern North America, Western Europe, West Africa"],
+"2028-07-22":[146,-.6056,1.056,"Total: Australia, New Zealand. Partial: Southeast Asia, Australia, Oceania"],
+"2029-01-14":[151,1.0553,.8714,"Partial: North America, Central America"],
+"2029-06-12":[118,1.2943,.4576,"Partial: Northern and Central Europe, Northern Russia, Greenland, Alaska, Northwestern Canada"],
+"2029-07-11":[156,-1.4191,.2303,"Partial: Southern Chile and Argentina"],
+"2029-12-05":[123,-1.0609,.8911,"Partial: Extreme Southern Argentina and Chile, Antarctica"]};
+const TT=69184,rd=s=>s.trim().split("\n").map(r=>r.trim().split(" "));
+const SKIND={T:"Total",A:"Annular",H:"Hybrid",P:"Partial",t:"Total (non-central)",a:"Annular (non-central)"},LKIND={T:"Total",P:"Partial",N:"Penumbral"};
+// Wikipedia / NASA (Espenak): date, TT of greatest eclipse, saros, type, gamma, magnitude, central duration
+const SOL=rd(`2025-03-29 10:48:36 149 P 1.0405 0.9376
+2025-09-21 19:43:04 154 P -1.0651 0.855
+2026-02-17 12:13:06 121 A -0.9743 0.963 2:20
+2026-08-12 17:47:06 126 T 0.8977 1.0386 2:18
+2027-02-06 16:00:48 131 A -0.2952 0.9281 7:51
+2027-08-02 10:07:50 136 T 0.1421 1.079 6:23
+2028-01-26 15:08:59 141 A 0.3901 0.9208 10:27
+2028-07-22 02:56:40 146 T -0.6056 1.056 5:10
+2029-01-14 17:13:48 151 P 1.0553 0.8714
+2029-06-12 04:06:13 118 P 1.2943 0.4576
+2029-07-11 15:37:19 156 P -1.4191 0.2303
+2029-12-05 15:03:58 123 P -1.0609 0.8911
+2030-06-01 06:29:13 128 A 0.5626 0.9443 5:21
+2030-11-25 06:51:37 133 T -0.3867 1.0468 3:44
+2031-05-21 07:16:04 138 A -0.197 0.9589 5:26
+2031-11-14 21:07:31 143 H 0.3078 1.0106 1:08
+2032-05-09 13:26:42 148 A -0.9375 0.9957 0:22
+2032-11-03 05:34:13 153 P 1.0643 0.8554
+2033-03-30 18:02:36 120 T 0.9778 1.0462 2:37
+2033-09-23 13:54:31 125 P -1.1583 0.689
+2034-03-20 10:18:45 130 T 0.2894 1.0458 4:09
+2034-09-12 16:19:28 135 A -0.3936 0.9736 2:58
+2035-03-09 23:05:54 140 A -0.4368 0.9919 0:48
+2035-09-02 01:56:46 145 T 0.3727 1.032 2:54
+2036-02-27 04:46:49 150 P -1.1942 0.6286
+2036-07-23 10:32:06 117 P -1.425 0.1991
+2036-08-21 17:25:45 155 P 1.0825 0.8622
+2037-01-16 09:48:55 122 P 1.1477 0.7049
+2037-07-13 02:40:36 127 T -0.7246 1.0413 3:58
+2038-01-05 13:47:11 132 A 0.4169 0.9728 3:18
+2038-07-02 13:32:55 137 A 0.0398 0.9911 1:00
+2038-12-26 01:00:10 142 T -0.2881 1.0268 2:18
+2039-06-21 17:12:54 147 A 0.8312 0.9454 4:05
+2039-12-15 16:23:46 152 T -0.9458 1.0356 1:51
+2040-05-11 03:43:02 119 P -1.2529 0.5306
+2040-11-04 19:09:02 124 P 1.0993 0.8074
+2041-04-30 11:52:21 129 T -0.4492 1.0189 1:51
+2041-10-25 01:36:22 134 A 0.4133 0.9467 6:07
+2042-04-20 02:17:30 139 T 0.2956 1.0614 4:51
+2042-10-14 02:00:42 144 A -0.303 0.93 7:44
+2043-04-09 18:57:49 149 t 1.0031 1.0095
+2043-10-03 03:01:49 154 a 1.0102 0.9497
+2044-02-28 20:24:40 121 A -0.9954 0.96 2:27
+2044-08-23 01:17:02 126 T 0.9613 1.0364 2:04
+2045-02-16 23:56:07 131 A -0.3125 0.9285 7:47
+2045-08-12 17:42:39 136 T 0.2116 1.0774 6:06
+2046-02-05 23:06:26 141 A 0.3765 0.9232 9:42
+2046-08-02 10:21:13 146 T -0.535 1.0531 4:51
+2047-01-26 01:33:18 151 P 1.045 0.8907
+2047-06-23 10:52:31 118 P 1.3766 0.3129
+2047-07-22 22:36:17 156 P -1.3477 0.3604
+2047-12-16 23:50:12 123 P -1.0661 0.8816
+2048-06-11 12:58:53 128 A 0.6468 0.9441 4:58
+2048-12-05 15:35:27 133 T -0.3973 1.044 3:28
+2049-05-31 13:59:59 138 A -0.1187 0.9631 4:45
+2049-11-25 05:33:48 143 H 0.2943 1.0057 0:38
+2050-05-20 20:42:50 148 H -0.8688 1.0038 0:21
+2050-11-14 13:30:53 153 P 1.0447 0.8874`).map(([d,tm,s,y,g,m,u])=>({day:d,t:Date.parse(d+"T"+tm+"Z")-TT,saros:+s,kind:SKIND[y],gamma:+g,mag:+m,dur:u||""}));
+// date, TT of greatest eclipse, saros, type, gamma, penumbral mag, umbral mag, contacts U1..U4 (UTC)
+const LUN=rd(`2025-03-14 06:58:45 123 T 0.3485 2.2614 1.1804 05:09,06:26,07:32,08:48
+2025-09-07 18:11:43 128 T -0.2752 2.3459 1.3638 16:27,17:31,18:53,19:56
+2026-03-03 11:33:37 133 T -0.3765 2.1858 1.1526 09:50,11:04,12:03,13:17
+2026-08-28 04:12:49 138 P -0.4694 1.9664 0.9319 02:34,,,05:52
+2027-02-20 23:12:51 143 N -1.048 0.9286 -0.0549
+2027-07-18 16:02:53 110 N -1.5759 0.0032 -1.0662
+2027-08-17 07:13:43 148 N 1.2797 0.5476 -0.5234
+2028-01-12 04:12:57 115 P 0.9817 1.0485 0.0679 03:45,,,04:41
+2028-07-06 18:19:41 120 P -0.7904 1.4282 0.3908 17:09,,,19:30
+2028-12-31 16:51:58 125 T 0.3258 2.2758 1.2479 15:08,16:16,17:28,18:36
+2029-06-26 03:22:05 130 T 0.0124 2.8282 1.8452 01:32,02:31,04:13,05:12
+2029-12-20 22:43:12 135 T -0.3811 2.2023 1.119 20:57,22:16,23:10,00:30
+2030-06-15 18:34:34 140 P 0.7534 1.4495 0.5025 17:22,,,19:47
+2030-12-09 22:28:51 145 N -1.0732 0.943 -0.1613
+2031-05-07 03:41:03 112 N -1.0694 0.8827 -0.0892
+2031-06-05 11:45:17 150 N 1.4732 0.1306 -0.8185
+2031-10-30 07:46:45 117 N 1.1774 0.7173 -0.3193
+2032-04-25 15:14:51 122 T -0.3558 2.2204 1.1925 13:28,14:41,15:46,16:59
+2032-10-18 19:03:40 127 T 0.4169 2.0841 1.1039 17:26,18:40,19:27,20:42
+2033-04-14 19:13:51 132 T 0.3954 2.1722 1.0955 17:26,18:49,19:38,21:01
+2033-10-08 10:56:23 137 T -0.2889 2.3068 1.3508 09:15,10:17,11:36,12:38
+2034-04-03 19:06:59 142 N 1.1144 0.8557 -0.2263
+2034-09-28 02:47:37 147 P -1.011 0.9922 0.0155 02:34,,,03:01
+2035-02-22 09:06:12 114 N -1.0357 0.9663 -0.0523
+2035-08-19 01:12:15 119 P 0.9433 1.1519 0.1049 00:34,,,01:51
+2036-02-11 22:13:06 124 T -0.311 2.2762 1.3007 20:32,21:36,22:50,23:54
+2036-08-07 02:52:32 129 T 0.2004 2.5279 1.4556 00:57,02:05,03:40,04:48
+2037-01-31 14:00:16 134 T 0.3619 2.1815 1.2086 12:22,13:28,14:32,15:39
+2037-07-27 04:09:53 139 P -0.5582 1.8597 0.8108 02:34,,,05:46
+2038-01-21 03:49:52 144 N 1.071 0.9009 -0.1127
+2038-06-17 02:43:44 111 N 1.3082 0.4438 -0.5259
+2038-07-16 11:35:56 149 N -1.2837 0.5013 -0.4938
+2038-12-11 17:45:00 116 N -1.1448 0.8062 -0.2876
+2039-06-06 18:54:25 121 P 0.546 1.8289 0.8863 17:25,,,20:24
+2039-11-30 16:56:28 126 P -0.4721 2.0435 0.9443 15:13,,,18:39
+2040-05-26 11:46:22 131 T -0.1872 2.4955 1.5365 10:01,11:00,12:32,13:32
+2040-11-18 19:04:40 136 T 0.2361 2.4543 1.3991 17:14,18:21,19:49,20:55
+2041-05-16 00:41:37 141 P -0.9746 1.0765 0.0663 00:13,,,01:11
+2041-11-08 04:33:39 146 P 0.9212 1.1675 0.1714 03:48,,,05:19
+2042-04-05 14:28:45 113 N 1.108 0.87 -0.2156
+2042-09-29 10:44:20 118 N -1.0261 0.9548 -0.0011
+2042-10-28 19:33:00 156 N 1.557 0.008 -0.974
+2043-03-25 14:30:36 123 T 0.3849 2.192 1.1161 12:43,14:04,14:57,16:18
+2043-09-19 01:50:22 128 T -0.3316 2.2452 1.2575 00:07,01:15,02:26,03:33
+2044-03-13 19:37:05 133 T -0.3496 2.2322 1.205 17:53,19:04,20:10,21:22
+2044-09-07 11:19:16 138 T 0.4318 2.0879 1.0456 09:36,11:02,11:36,13:02
+2045-03-03 07:43:26 143 N -1.0274 0.9643 -0.0148
+2045-08-27 13:53:21 148 N 1.206 0.6845 -0.3899
+2046-01-22 13:01:07 115 P 0.9885 1.0365 0.055 12:36,,,13:26
+2046-07-18 01:04:36 120 P -0.8691 1.2824 0.2478 00:07,,,02:02
+2047-01-12 01:24:44 125 T 0.3317 2.2665 1.2358 23:40,00:50,02:00,03:09
+2047-07-07 10:34:15 130 T -0.0636 2.7326 1.7529 08:45,09:44,11:25,12:23
+2048-01-01 06:52:24 135 T -0.3745 2.2158 1.1297 05:05,06:24,07:20,08:40
+2048-06-26 02:00:57 140 P 0.6796 1.5841 0.6404 00:41,,,03:21
+2048-12-20 06:26:16 145 N -1.0624 0.9632 -0.142
+2049-05-17 11:25:06 112 N -1.1337 0.7651 -0.2073
+2049-06-15 19:12:40 150 N 1.4068 0.2526 -0.697
+2049-11-09 15:50:39 117 N 1.1964 0.6821 -0.3541
+2050-05-06 22:30:28 122 T -0.4181 2.1064 1.0779 20:48,22:09,22:52,00:14
+2050-10-30 03:20:12 127 T 0.4435 2.0356 1.0549 01:44,03:03,03:37,04:57`).map(([d,tm,s,y,g,p,u,c])=>({day:d,t:Date.parse(d+"T"+tm+"Z")-TT,saros:+s,kind:LKIND[y],gamma:+g,pen:+p,umb:+u,c:c||""}));
+const wk=(m,d)=>m[d]||null;
+const pick=(a,now,comp)=>{const i=a.findIndex(x=>x.t>now);return i>0?[a[i-1],a[i]]:comp(now)};
+const compSolar=now=>{const t0=new Date(now-420*864e5);let g=Astronomy.SearchGlobalSolarEclipse(t0),p=null;while(g.peak.date.getTime()<now){p=g;g=Astronomy.NextGlobalSolarEclipse(g.peak)}
+const f=e=>({t:e.peak.date.getTime(),kind:e.kind,lat:e.latitude,lon:e.longitude,calc:1});return[f(p),f(g)]};
+const compLunar=now=>{const t0=new Date(now-420*864e5);let g=Astronomy.SearchLunarEclipse(t0),p=null;while(g.peak.date.getTime()<now){p=g;g=Astronomy.NextLunarEclipse(g.peak)}
+const f=e=>({t:e.peak.date.getTime(),kind:e.kind,calc:1,sp:e.sd_penum,sq:e.sd_partial,su:e.sd_total});return[f(p),f(g)]};
+let EC=null;
+const llTxt=(la,lo)=>Math.abs(la).toFixed(1)+"°"+(la<0?"S":"N")+" "+Math.abs(lo).toFixed(1)+"°"+(lo<0?"W":"E");
+const hm=m=>Math.floor(m/60)+" h "+f2(Math.round(m%60))+" min";
+function solarHtml(e,tag){const o=new Astronomy.Observer(LAT,LON,0),w=WS[e.day||""];let l=null;
+try{const q=Astronomy.SearchLocalSolarEclipse(new Date(e.t-1.5*864e5),o);if(Math.abs(q.peak.time.date-e.t)<3*864e5)l=q}catch(x){}
+return`<b>${tag}: ${e.kind} solar eclipse</b><br>Greatest eclipse: ${fdt(e.t)}`
++(e.saros?`<br><span class="m">Saros ${e.saros} · gamma ${e.gamma} · magnitude ${e.mag}${e.dur?" · central duration "+e.dur:""}</span>`:"")
++(e.lat!=null?`<br><span class="m">Near ${llTxt(e.lat,e.lon)}</span>`:"")+(w?`<br><span class="m">${w[3]}</span>`:"")
++(e.calc?`<br><span class="m">Computed (beyond the Wikipedia table).</span>`:"")
++"<br>"+(l?`<b>At this location:</b> ${l.kind}, ${(l.obscuration*100).toFixed(0)}% of the Sun covered · begins ${fdt(l.partial_begin.time.date.getTime())} · maximum ${fdt(l.peak.time.date.getTime())} (Sun ${l.peak.altitude.toFixed(0)}° high) · ends ${fdt(l.partial_end.time.date.getTime())}`:`<span class="m">Not visible from this location.</span>`)}
+function lunarHtml(e,tag){const o=new Astronomy.Observer(LAT,LON,0),t=Astronomy.MakeTime(new Date(e.t)),q=Astronomy.Equator("Moon",t,o,true,true),alt=Astronomy.Horizon(t,o,q.ra,q.dec,"normal").altitude;
+const c=e.c?e.c.split(","):[],mn=x=>{const[h,m]=x.split(":");return+h*60+ +m},df=(a,b)=>((mn(b)-mn(a))%1440+1440)%1440;
+const d=e.calc?"Penumbral "+hm(2*e.sp)+(e.sq>0?" · Partial "+hm(2*e.sq):"")+(e.su>0?" · Total "+hm(2*e.su):""):(c[0]&&c[3]?"Partial "+hm(df(c[0],c[3]))+(c[1]&&c[2]?" · Total "+hm(df(c[1],c[2])):""):"");
+return`<b>${tag}: ${e.kind} lunar eclipse</b><br>Greatest eclipse: ${fdt(e.t)}`+(d?`<br><span class="m">${d}</span>`:"")
++(e.saros?`<br><span class="m">Saros ${e.saros} · gamma ${e.gamma} · penumbral mag ${e.pen} · umbral mag ${e.umb}`+(e.c?`<br>Contacts (UTC): ${c.map((x,i)=>"U"+(i+1)+" "+(x||"–")).join(" · ")}`:"")+"</span>":"")
++(e.calc?`<br><span class="m">Computed (beyond the Wikipedia table).</span>`:"")
++"<br>"+(alt>0?`<b>At this location:</b> Moon is ${alt.toFixed(0)}° above the horizon at maximum, so it can be seen.`:`<span class="m">At this location the Moon is below the horizon at maximum (${alt.toFixed(0)}°).</span>`)}
+function eclData(now){const k=LAT+","+LON+","+TZ;if(EC&&EC.k==k&&now<EC.n0&&now<EC.n1)return EC;
+const s=pick(SOL,now,compSolar),l=pick(LUN,now,compLunar);
+return EC={k,n0:s[1].t,n1:l[1].t,h:[solarHtml(s[0],"Last"),solarHtml(s[1],"Next"),lunarHtml(l[0],"Last"),lunarHtml(l[1],"Next")]}}
+const eclHtml=now=>eclData(now).h;
+const setH=(id,h)=>{const e=$(id);if(e.dataset.h!==h){e.dataset.h=h;e.innerHTML=h}};
 const f2=n=>String(n).padStart(2,"0"),$=id=>document.getElementById(id);
 let FM,FW,FD;const mk=()=>{FM=new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hourCycle:"h23",hour:"2-digit",minute:"2-digit",second:"2-digit"});
 FW=new Intl.DateTimeFormat("en-US",{timeZone:TZ,weekday:"short"});FD=new Intl.DateTimeFormat("en-GB",{timeZone:TZ,weekday:"short",day:"numeric",month:"short",year:"numeric"})};
@@ -157,6 +341,8 @@ $("lagna").textContent=sg(p.As)+" "+dms(p.As);
 kk=kn==0?["Kimstughna","किंस्तुघ्न"]:kn<57?KAR[(kn-1)%7]:KFIX[kn-57];
 $("masa").textContent=(ad?"Adhika ":"")+nm[0]+" ("+nm[1]+") · Amanta  |  Purnimanta: "+pm[0]+" ("+pm[1]+")";
 $("kar").textContent=kk[0]+" ("+kk[1]+")"}
+try{setH("trb",transRows(p));const eh=eclHtml(now);setH("es0",eh[0]);setH("es1",eh[1]);setH("el0",eh[2]);setH("el1",eh[3])}catch(e){}
+if(!TQ)TQ=setTimeout(stepTransits,0);
 $("tb").innerHTML=[...P.map(x=>[x[1],p[x[0]]]),["Lagna",p.As]].map(([n,l])=>`<tr><td>${n}</td><td>${sg(l)}</td><td>${dms(l)}</td><td>${nk(l)}</td></tr>`).join("")}
 function applyLoc(lat,lon,tz,name){try{new Intl.DateTimeFormat("en",{timeZone:tz})}catch(e){tz="Asia/Kolkata"}LAT=lat;LON=lon;TZ=tz;LN=name;VD=null;if(typeof Astronomy!=="undefined")OBS=new Astronomy.Observer(LAT,LON,0);
 if(![...sel.options].some(o=>o.value==tz))sel.add(new Option(tz,tz));sel.value=tz;mk();
